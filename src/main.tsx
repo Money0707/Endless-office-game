@@ -17,29 +17,83 @@ type AudioContextLike = AudioContext & {
 
 type SoundEvent = 'click' | 'observe' | 'progress' | 'loop' | 'bad' | 'true' | 'restart' | 'glass' | 'type';
 
-const BAD_ENDING_LORE = [
-  '其实，Unknown B 曾经也只是某间公司的普通员工。',
-  '很多年前，他和你一样，在凌晨还独自留在办公室工作。电脑上出现了两个来源不明的讯息，而他在关键时刻做出了错误的选择：回复了当时的 Unknown。',
-  '下一秒，系统完成了身份交换。',
-  'USER SWAPPED\nYOU ARE NOW UNKNOWN B',
-  '从那一刻开始，他的员工资料、名字和现实身份全部被抹除。他的意识被困在公司的虚拟系统里，只能以 Unknown B 的身份，通过电脑讯息寻找下一个替代者。',
-  '他无法主动离开。',
-  '唯一的逃脱方式，就是让另一名员工相信他、回应他，并自愿建立连接。只要有人回复，他就能夺取对方的身份，重新回到现实世界；而被替换的人，则会成为新的 Unknown。',
-  '他等了很多年。',
-  '办公室换过员工，系统更新过无数次，旧电脑被丢弃，新的电脑又重新连接服务器。他不断发送同一句话：',
-  "HEY! I'M HELPING YOU!\nREPLY TO ME.",
-  '直到那天晚上，“你”出现了。',
-  '你以为 Unknown B 是在帮助你逃离办公室。你回复了他。',
-  '屏幕上随即出现：',
-  'UNKNOWN B: THANK YOU.\nUSER SWAPPED\nYOU ARE NOW UNKNOWN B',
-  '真正的 Unknown B 终于取得了你的员工编号、面孔、记忆与身体。',
-  '他以“你”的身份离开公司。隔天，同事们看见的仍然是熟悉的你。',
-  '但电脑系统深处，你被困在没有出口的虚拟办公室里。时间永远停留在 11:59 PM。',
-  '你终于明白，Unknown B 并不是在救你。',
-  '他只是在找替补。',
-  '而现在，你只能等待下一名独自加班的员工出现，然后发送那句你曾经收到过的话：',
-  "HEY! I'M HELPING YOU!\nREPLY TO ME.",
-  'IDENTITY TRANSFER COMPLETE\nPREVIOUS USER: RELEASED\nCURRENT USER: UNKNOWN B\nWAITING FOR NEXT CONNECTION...'
+type LorePage = {
+  eyebrow: string;
+  title: string;
+  body: string[];
+  terminal?: string[];
+  image?: string;
+};
+
+const BAD_ENDING_LORE: LorePage[] = [
+  {
+    eyebrow: 'Story Core Setting',
+    title: 'Unknown B Was Once Like You',
+    image: '/unknown-b-lore.png',
+    body: [
+      'Unknown B was once an ordinary employee at this company.',
+      'Years ago, he stayed alone in the office after midnight, just like you. Two messages from unknown sources appeared on his computer. At the critical moment, he made the wrong choice: he replied.'
+    ]
+  },
+  {
+    eyebrow: 'The Swap',
+    title: 'One Reply Changed Everything',
+    body: [
+      'The next second, the system completed an identity exchange.',
+      'His employee file, name, face, and real-world identity were erased. His consciousness was trapped inside the company system.'
+    ],
+    terminal: ['USER SWAPPED', 'YOU ARE NOW UNKNOWN B']
+  },
+  {
+    eyebrow: 'The Rule',
+    title: 'He Could Not Leave',
+    body: [
+      'From that moment on, he could only exist as Unknown B, sending messages through office computers and searching for someone to replace him.',
+      'There was only one way out: another employee had to trust him, reply to him, and willingly create a connection.'
+    ]
+  },
+  {
+    eyebrow: 'The Trap',
+    title: 'A New Body For An Old Prisoner',
+    body: [
+      'If someone replied, he could take their identity and return to the real world. The person who answered would become the new Unknown.',
+      'He waited for years. Employees changed, systems updated, old laptops were thrown away, and new ones connected to the same server.'
+    ]
+  },
+  {
+    eyebrow: 'The Message',
+    title: 'The Same Line, Again And Again',
+    body: [
+      'He kept sending the same message, night after night, waiting for one tired employee to believe him.'
+    ],
+    terminal: ["HEY! I'M HELPING YOU!", 'REPLY TO ME.']
+  },
+  {
+    eyebrow: 'That Night',
+    title: 'Then You Appeared',
+    body: [
+      'You thought Unknown B was helping you escape the office. You replied to him.',
+      'The screen answered immediately.'
+    ],
+    terminal: ['UNKNOWN B: THANK YOU.', 'USER SWAPPED', 'YOU ARE NOW UNKNOWN B']
+  },
+  {
+    eyebrow: 'The Reveal',
+    title: 'He Was Never Saving You',
+    body: [
+      'The real Unknown B finally obtained your employee number, your face, your memories, and your body.',
+      'He left the company wearing your identity. The next day, your coworkers still saw the same familiar person.'
+    ]
+  },
+  {
+    eyebrow: 'The New Unknown',
+    title: 'Now You Wait',
+    body: [
+      'Deep inside the computer system, you are trapped in a virtual office with no exit. Time is frozen at 11:59 PM.',
+      'Now you understand: Unknown B was not trying to save you. He was looking for a replacement.'
+    ],
+    terminal: ['IDENTITY TRANSFER COMPLETE', 'PREVIOUS USER: RELEASED', 'CURRENT USER: UNKNOWN B', 'WAITING FOR NEXT CONNECTION...']
+  }
 ];
 
 function App() {
@@ -359,10 +413,11 @@ function GameScene({
   const isBadEnding2 = scene.id === 'badEnding2';
   const noticeText = observedClue || scene.description;
   const [typedNotice, setTypedNotice] = useState('');
-  const [showBadEndingLore, setShowBadEndingLore] = useState(false);
+  const [lorePage, setLorePage] = useState<number | null>(null);
+  const activeLorePage = lorePage === null ? null : BAD_ENDING_LORE[lorePage];
 
   useEffect(() => {
-    setShowBadEndingLore(false);
+    setLorePage(null);
   }, [scene.id]);
 
   useEffect(() => {
@@ -402,59 +457,96 @@ function GameScene({
         </div>
       </div>
 
-      <aside className="actionPanel">
-        <ProgressIndicator scene={scene} />
-        <Terminal lines={scene.terminal} />
-
-        {scene.options.length > 0 && <p className="choicesKicker">WHAT WILL YOU DO</p>}
-        <div className="choicesList">
-          {scene.options.map((option) => (
-            <button className="choiceButton" key={option.key} onClick={() => onChoose(option.key)}>
-              <span className="choiceKey">{option.key}</span>
-              <strong>{option.label}</strong>
-            </button>
-          ))}
-        </div>
-
-        {isBadEnding2 && (
-          <button
-            className="secondaryButton loreButton"
-            onClick={() => {
-              onPlaySound('observe');
-              setShowBadEndingLore((value) => !value);
+      <aside className={`actionPanel ${activeLorePage ? 'storybookMode' : ''}`}>
+        {activeLorePage ? (
+          <BadEndingLore
+            page={activeLorePage}
+            pageNumber={lorePage + 1}
+            totalPages={BAD_ENDING_LORE.length}
+            onBack={() => {
+              onPlaySound('click');
+              setLorePage((value) => (value && value > 0 ? value - 1 : null));
             }}
-          >
-            故事核心设定
-          </button>
-        )}
+            onNext={() => {
+              onPlaySound('click');
+              setLorePage((value) => (value === null || value >= BAD_ENDING_LORE.length - 1 ? null : value + 1));
+            }}
+          />
+        ) : (
+          <>
+            <ProgressIndicator scene={scene} />
+            <Terminal lines={scene.terminal} />
 
-        {isBadEnding2 && showBadEndingLore && <BadEndingLore />}
+            {scene.options.length > 0 && <p className="choicesKicker">WHAT WILL YOU DO</p>}
+            <div className="choicesList">
+              {scene.options.map((option) => (
+                <button className="choiceButton" key={option.key} onClick={() => onChoose(option.key)}>
+                  <span className="choiceKey">{option.key}</span>
+                  <strong>{option.label}</strong>
+                </button>
+              ))}
+            </div>
 
-        {isEnding && (
-          <button className="secondaryButton" onClick={onRestart}>
-            <RotateCcw size={17} />
-            Opening Screen
-          </button>
+            {isBadEnding2 && (
+              <button
+                className="secondaryButton loreButton"
+                onClick={() => {
+                  onPlaySound('observe');
+                  setLorePage(0);
+                }}
+              >
+                Story Core Setting
+              </button>
+            )}
+
+            {isEnding && (
+              <button className="secondaryButton" onClick={onRestart}>
+                <RotateCcw size={17} />
+                Opening Screen
+              </button>
+            )}
+          </>
         )}
       </aside>
     </section>
   );
 }
 
-function BadEndingLore() {
+function BadEndingLore({
+  page,
+  pageNumber,
+  totalPages,
+  onBack,
+  onNext
+}: {
+  page: LorePage;
+  pageNumber: number;
+  totalPages: number;
+  onBack: () => void;
+  onNext: () => void;
+}) {
+  const isLastPage = pageNumber === totalPages;
+
   return (
     <article className="badEndingLore" aria-label="Bad ending story lore">
-      <p className="choicesKicker">IDENTITY FILE</p>
-      {BAD_ENDING_LORE.map((line) => (
-        <p className={line.includes('\n') ? 'loreTerminal' : ''} key={line}>
-          {line.split('\n').map((part) => (
-            <React.Fragment key={part}>
-              {part}
-              <br />
-            </React.Fragment>
-          ))}
-        </p>
-      ))}
+      <div className="lorePage" key={pageNumber}>
+        {page.image && <img className="loreImage" src={page.image} alt="Unknown B trapped inside the company system" />}
+        <p className="choicesKicker">{page.eyebrow}</p>
+        <h3>{page.title}</h3>
+        {page.body.map((line) => (
+          <p key={line}>{line}</p>
+        ))}
+        {page.terminal && <Terminal lines={page.terminal} />}
+      </div>
+      <div className="loreControls">
+        <button className="secondaryButton" onClick={onBack}>
+          {pageNumber === 1 ? 'Close' : 'Back'}
+        </button>
+        <span>{pageNumber} / {totalPages}</span>
+        <button className="secondaryButton" onClick={onNext}>
+          {isLastPage ? 'Close' : 'Next'}
+        </button>
+      </div>
     </article>
   );
 }
