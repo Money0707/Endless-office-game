@@ -17,6 +17,31 @@ type AudioContextLike = AudioContext & {
 
 type SoundEvent = 'click' | 'observe' | 'progress' | 'loop' | 'bad' | 'true' | 'restart' | 'glass' | 'type';
 
+const BAD_ENDING_LORE = [
+  '其实，Unknown B 曾经也只是某间公司的普通员工。',
+  '很多年前，他和你一样，在凌晨还独自留在办公室工作。电脑上出现了两个来源不明的讯息，而他在关键时刻做出了错误的选择：回复了当时的 Unknown。',
+  '下一秒，系统完成了身份交换。',
+  'USER SWAPPED\nYOU ARE NOW UNKNOWN B',
+  '从那一刻开始，他的员工资料、名字和现实身份全部被抹除。他的意识被困在公司的虚拟系统里，只能以 Unknown B 的身份，通过电脑讯息寻找下一个替代者。',
+  '他无法主动离开。',
+  '唯一的逃脱方式，就是让另一名员工相信他、回应他，并自愿建立连接。只要有人回复，他就能夺取对方的身份，重新回到现实世界；而被替换的人，则会成为新的 Unknown。',
+  '他等了很多年。',
+  '办公室换过员工，系统更新过无数次，旧电脑被丢弃，新的电脑又重新连接服务器。他不断发送同一句话：',
+  "HEY! I'M HELPING YOU!\nREPLY TO ME.",
+  '直到那天晚上，“你”出现了。',
+  '你以为 Unknown B 是在帮助你逃离办公室。你回复了他。',
+  '屏幕上随即出现：',
+  'UNKNOWN B: THANK YOU.\nUSER SWAPPED\nYOU ARE NOW UNKNOWN B',
+  '真正的 Unknown B 终于取得了你的员工编号、面孔、记忆与身体。',
+  '他以“你”的身份离开公司。隔天，同事们看见的仍然是熟悉的你。',
+  '但电脑系统深处，你被困在没有出口的虚拟办公室里。时间永远停留在 11:59 PM。',
+  '你终于明白，Unknown B 并不是在救你。',
+  '他只是在找替补。',
+  '而现在，你只能等待下一名独自加班的员工出现，然后发送那句你曾经收到过的话：',
+  "HEY! I'M HELPING YOU!\nREPLY TO ME.",
+  'IDENTITY TRANSFER COMPLETE\nPREVIOUS USER: RELEASED\nCURRENT USER: UNKNOWN B\nWAITING FOR NEXT CONNECTION...'
+];
+
 function App() {
   const [mode, setMode] = useState<'intro' | 'playing'>('intro');
   const [sceneId, setSceneId] = useState<SceneId>(START_SCENE);
@@ -331,8 +356,14 @@ function GameScene({
   onPlaySound: (event: SoundEvent) => void;
 }) {
   const isEnding = scene.id === 'trueEnding';
+  const isBadEnding2 = scene.id === 'badEnding2';
   const noticeText = observedClue || scene.description;
   const [typedNotice, setTypedNotice] = useState('');
+  const [showBadEndingLore, setShowBadEndingLore] = useState(false);
+
+  useEffect(() => {
+    setShowBadEndingLore(false);
+  }, [scene.id]);
 
   useEffect(() => {
     setTypedNotice('');
@@ -385,6 +416,20 @@ function GameScene({
           ))}
         </div>
 
+        {isBadEnding2 && (
+          <button
+            className="secondaryButton loreButton"
+            onClick={() => {
+              onPlaySound('observe');
+              setShowBadEndingLore((value) => !value);
+            }}
+          >
+            故事核心设定
+          </button>
+        )}
+
+        {isBadEnding2 && showBadEndingLore && <BadEndingLore />}
+
         {isEnding && (
           <button className="secondaryButton" onClick={onRestart}>
             <RotateCcw size={17} />
@@ -393,6 +438,24 @@ function GameScene({
         )}
       </aside>
     </section>
+  );
+}
+
+function BadEndingLore() {
+  return (
+    <article className="badEndingLore" aria-label="Bad ending story lore">
+      <p className="choicesKicker">IDENTITY FILE</p>
+      {BAD_ENDING_LORE.map((line) => (
+        <p className={line.includes('\n') ? 'loreTerminal' : ''} key={line}>
+          {line.split('\n').map((part) => (
+            <React.Fragment key={part}>
+              {part}
+              <br />
+            </React.Fragment>
+          ))}
+        </p>
+      ))}
+    </article>
   );
 }
 
