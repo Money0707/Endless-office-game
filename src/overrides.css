@@ -654,3 +654,67 @@
     max-height: none;
   }
 }
+
+/* Storybook frame correction */
+.immersiveLayout:has(.actionPanel.storybookMode) {
+  grid-template-columns: minmax(320px, 760px) !important;
+}
+
+.immersiveLayout:has(.actionPanel.storybookMode) .actionPanel {
+  width: min(760px, calc(100vw - 36px)) !important;
+  max-width: 760px !important;
+  min-height: auto !important;
+  max-height: none !important;
+  padding: 12px !important;
+}
+
+.actionPanel.storybookMode {
+  border-color: rgba(127, 29, 29, 0.44) !important;
+  box-shadow: 0 0 34px rgba(127, 29, 29, 0.2) !important;
+}
+
+.badEndingLore {
+  min-height: auto !important;
+  padding: 14px !important;
+  border-color: rgba(127, 29, 29, 0.54) !important;
+}
+
+.lorePage {
+  display: grid;
+  gap: 12px;
+}
+
+.loreImage {
+  width: 100% !important;
+  aspect-ratio: 4 / 3 !important;
+  height: auto !important;
+  max-height: min(48vh, 470px) !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  margin: 0 !important;
+  background: #05070a !important;
+}
+
+.badEndingLore .choicesKicker {
+  margin: 4px 0 0 !important;
+}
+
+.badEndingLore h3 {
+  margin: 0 !important;
+}
+
+.loreControls {
+  margin-top: 12px !important;
+}
+
+@media (max-width: 720px) {
+  .immersiveLayout:has(.actionPanel.storybookMode) .actionPanel {
+    width: calc(100vw - 24px) !important;
+    padding: 10px !important;
+  }
+
+  .loreImage {
+    aspect-ratio: 1 / 1 !important;
+    max-height: 42vh !important;
+  }
+}
