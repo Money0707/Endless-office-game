@@ -1,3 +1,8 @@
+.sceneHud h2 {
+  font-size: clamp(1.15rem, 2.15vw, 2.25rem) !important;
+  line-height: 1.04;
+}
+
 .typewriterNotice {
   position: absolute;
   left: 4.6%;
@@ -285,6 +290,10 @@
 }
 
 @media (max-width: 720px) {
+  .sceneHud h2 {
+    font-size: clamp(1rem, 7vw, 1.85rem) !important;
+  }
+
   .typewriterNotice {
     width: calc(100% - 28px);
     left: 14px;
