@@ -83,7 +83,8 @@
 .scene-floor2 .hotspot,
 .scene-floor3 .hotspot,
 .scene-floor4 .hotspot,
-.scene-floor5 .hotspot {
+.scene-floor5 .hotspot,
+.scene-trueEnding .hotspot {
   z-index: 7;
   min-height: 36px;
   padding: 8px 15px;
@@ -108,7 +109,9 @@
 .scene-floor4 .hotspot::before,
 .scene-floor4 .hotspot::after,
 .scene-floor5 .hotspot::before,
-.scene-floor5 .hotspot::after {
+.scene-floor5 .hotspot::after,
+.scene-trueEnding .hotspot::before,
+.scene-trueEnding .hotspot::after {
   content: "";
   position: absolute;
   pointer-events: none;
@@ -118,7 +121,8 @@
 .scene-floor2 .hotspot::before,
 .scene-floor3 .hotspot::before,
 .scene-floor4 .hotspot::before,
-.scene-floor5 .hotspot::before {
+.scene-floor5 .hotspot::before,
+.scene-trueEnding .hotspot::before {
   inset: -5px -7px;
   border: 2px solid rgba(229, 231, 235, 0.72);
   border-radius: 46% 54% 43% 57% / 54% 43% 57% 46%;
@@ -131,7 +135,8 @@
 .scene-floor2 .hotspot::after,
 .scene-floor3 .hotspot::after,
 .scene-floor4 .hotspot::after,
-.scene-floor5 .hotspot::after {
+.scene-floor5 .hotspot::after,
+.scene-trueEnding .hotspot::after {
   left: 22px;
   bottom: -10px;
   width: 22px;
@@ -152,7 +157,9 @@
 .scene-floor4 .hotspot svg,
 .scene-floor4 .hotspot span,
 .scene-floor5 .hotspot svg,
-.scene-floor5 .hotspot span {
+.scene-floor5 .hotspot span,
+.scene-trueEnding .hotspot svg,
+.scene-trueEnding .hotspot span {
   position: relative;
   z-index: 1;
 }
@@ -161,7 +168,8 @@
 .scene-floor2 .hotspot svg,
 .scene-floor3 .hotspot svg,
 .scene-floor4 .hotspot svg,
-.scene-floor5 .hotspot svg {
+.scene-floor5 .hotspot svg,
+.scene-trueEnding .hotspot svg {
   width: 14px;
   height: 14px;
 }
@@ -170,7 +178,8 @@
 .scene-floor2 .hotspot span,
 .scene-floor3 .hotspot span,
 .scene-floor4 .hotspot span,
-.scene-floor5 .hotspot span {
+.scene-floor5 .hotspot span,
+.scene-trueEnding .hotspot span {
   font-size: 0.75rem;
   font-weight: 900;
   text-shadow: 0 1px 0 #000;
@@ -318,6 +327,41 @@
 .scene-floor5 .hotspot3 {
   left: 32%;
   top: 46%;
+}
+
+.scene-trueEnding .sceneIllustration.sunriseRoom {
+  background-image: url("/true-ending-lobby.png") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+.scene-trueEnding .sceneIllustration.sunriseRoom > *:not(.hotspot):not(.sceneGlitch) {
+  display: none;
+}
+
+.scene-trueEnding .sceneIllustration.sunriseRoom::before {
+  display: none;
+}
+
+.scene-trueEnding .sceneIllustration.sunriseRoom::after {
+  z-index: 2;
+  background: none;
+}
+
+.scene-trueEnding .hotspot1 {
+  left: 51%;
+  top: 42%;
+}
+
+.scene-trueEnding .hotspot2 {
+  left: 14%;
+  top: 46%;
+}
+
+.scene-trueEnding .hotspot3 {
+  left: 88%;
+  top: 12%;
 }
 
 @keyframes typewriterCursorBlink {
