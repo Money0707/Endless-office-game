@@ -15,7 +15,7 @@ type AudioContextLike = AudioContext & {
   webkitAudioContext?: typeof AudioContext;
 };
 
-type SoundEvent = 'click' | 'observe' | 'progress' | 'loop' | 'bad' | 'true' | 'restart' | 'glass';
+type SoundEvent = 'click' | 'observe' | 'progress' | 'loop' | 'bad' | 'true' | 'restart' | 'glass' | 'type';
 
 function App() {
   const [mode, setMode] = useState<'intro' | 'playing'>('intro');
@@ -71,6 +71,11 @@ function App() {
 
     const context = ensureAudioContext();
     if (!context) return;
+
+    if (event === 'type') {
+      playTone(context, 820 + Math.random() * 140, 0.018, 0.006, 'square');
+      return;
+    }
 
     if (event === 'click') {
       playTone(context, 132, 0.055, 0.035, 'triangle');
@@ -335,13 +340,17 @@ function GameScene({
     const timer = window.setInterval(() => {
       index += 1;
       setTypedNotice(noticeText.slice(0, index));
+      const typedChar = noticeText[index - 1];
+      if (typedChar && typedChar.trim() && index % 2 === 0) {
+        onPlaySound('type');
+      }
       if (index >= noticeText.length) {
         window.clearInterval(timer);
       }
     }, 22);
 
     return () => window.clearInterval(timer);
-  }, [noticeText]);
+  }, [noticeText, onPlaySound]);
 
   return (
     <section className={`immersiveLayout glitchIn theme-${scene.image} scene-${scene.id} ${isEnding ? 'endingLayout' : ''}`}>
