@@ -461,7 +461,7 @@ function GameScene({
         {activeLorePage ? (
           <BadEndingLore
             page={activeLorePage}
-            pageNumber={lorePage + 1}
+            pageNumber={BAD_ENDING_LORE.indexOf(activeLorePage) + 1}
             totalPages={BAD_ENDING_LORE.length}
             onBack={() => {
               onPlaySound('click');
