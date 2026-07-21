@@ -1951,3 +1951,23 @@ h2 {
     width: 100%;
   }
 }
+.sceneIllustration.floor1Main {
+  background-image: url("/floor-1-main.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.sceneIllustration.floor1Main > *:not(.hotspot):not(.scanLines):not(.sceneGlitch) {
+  display: none;
+}
+
+.sceneIllustration.floor1Main::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.42), transparent 35%, rgba(0, 0, 0, 0.28)),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.55));
+}
