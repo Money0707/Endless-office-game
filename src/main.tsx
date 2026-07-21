@@ -15,7 +15,19 @@ type AudioContextLike = AudioContext & {
   webkitAudioContext?: typeof AudioContext;
 };
 
-type SoundEvent = 'click' | 'observe' | 'progress' | 'loop' | 'bad' | 'true' | 'restart' | 'glass' | 'type';
+type SoundEvent =
+  | 'click'
+  | 'observe'
+  | 'progress'
+  | 'loop'
+  | 'bad'
+  | 'true'
+  | 'restart'
+  | 'glass'
+  | 'type'
+  | 'message'
+  | 'buzz'
+  | 'heartbeat';
 
 type LorePage = {
   eyebrow: string;
@@ -167,6 +179,29 @@ function App() {
       return;
     }
 
+    if (event === 'message') {
+      playTone(context, 640, 0.05, 0.018, 'square');
+      playTone(context, 310, 0.055, 0.016, 'sawtooth', 0.055);
+      playTone(context, 980, 0.028, 0.012, 'triangle', 0.13);
+      playTone(context, 48, 0.2, 0.018, 'sine', 0.15);
+      return;
+    }
+
+    if (event === 'buzz') {
+      playTone(context, 54 + Math.random() * 18, 0.055, 0.035, 'sawtooth');
+      playTone(context, 118 + Math.random() * 30, 0.035, 0.014, 'square', 0.045);
+      playTone(context, 42, 0.12, 0.018, 'sine', 0.08);
+      return;
+    }
+
+    if (event === 'heartbeat') {
+      playTone(context, 46, 0.16, 0.07, 'sine');
+      playTone(context, 38, 0.18, 0.05, 'triangle', 0.18);
+      playTone(context, 44, 0.2, 0.06, 'sine', 0.58);
+      playTone(context, 34, 0.22, 0.04, 'triangle', 0.78);
+      return;
+    }
+
     if (event === 'click') {
       playTone(context, 132, 0.055, 0.035, 'triangle');
       playTone(context, 72, 0.08, 0.025, 'sine');
@@ -249,6 +284,21 @@ function App() {
     };
   }, [soundOn, mode, sceneId, isBadState, scene.floor, transitionKey]);
 
+  useEffect(() => {
+    if (!soundOn || mode === 'intro') return;
+
+    const hasUnknownMessage = scene.terminal.some((line) => /UNKNOWN|MESSAGE|USER SWAPPED/i.test(line));
+    if (hasUnknownMessage) {
+      playSound('message');
+    }
+
+    if (sceneId !== 'badEnding2') return;
+
+    playSound('buzz');
+    const timer = window.setInterval(() => playSound('buzz'), 1150);
+    return () => window.clearInterval(timer);
+  }, [soundOn, mode, sceneId, transitionKey]);
+
   const status = useMemo(() => {
     if (mode === 'intro') return 'Shift not started';
     if (sceneId === 'trueEnding') return 'Escaped';
@@ -276,7 +326,12 @@ function App() {
       return;
     }
 
-    playSound(outcome.result === 'bad' ? 'bad' : outcome.result === 'true' ? 'true' : outcome.result === 'loop' ? 'loop' : 'progress');
+    if (outcome.result === 'bad') {
+      playSound('heartbeat');
+      window.setTimeout(() => playSound('bad'), 420);
+    } else {
+      playSound(outcome.result === 'true' ? 'true' : outcome.result === 'loop' ? 'loop' : 'progress');
+    }
 
     setRoute((current) => [
       ...current,
