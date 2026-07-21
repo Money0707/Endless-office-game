@@ -100,7 +100,7 @@ function App() {
   const [mode, setMode] = useState<'intro' | 'playing'>('intro');
   const [sceneId, setSceneId] = useState<SceneId>(START_SCENE);
   const [route, setRoute] = useState<RouteEntry[]>([]);
-  const [soundOn, setSoundOn] = useState(false);
+  const [soundOn, setSoundOn] = useState(true);
   const [observedClue, setObservedClue] = useState<string | null>(null);
   const [transitionKey, setTransitionKey] = useState(0);
   const [shattering, setShattering] = useState(false);
