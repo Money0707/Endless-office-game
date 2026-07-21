@@ -82,7 +82,8 @@
 .scene-floor1 .hotspot,
 .scene-floor2 .hotspot,
 .scene-floor3 .hotspot,
-.scene-floor4 .hotspot {
+.scene-floor4 .hotspot,
+.scene-floor5 .hotspot {
   z-index: 7;
   min-height: 36px;
   padding: 8px 15px;
@@ -105,7 +106,9 @@
 .scene-floor3 .hotspot::before,
 .scene-floor3 .hotspot::after,
 .scene-floor4 .hotspot::before,
-.scene-floor4 .hotspot::after {
+.scene-floor4 .hotspot::after,
+.scene-floor5 .hotspot::before,
+.scene-floor5 .hotspot::after {
   content: "";
   position: absolute;
   pointer-events: none;
@@ -114,7 +117,8 @@
 .scene-floor1 .hotspot::before,
 .scene-floor2 .hotspot::before,
 .scene-floor3 .hotspot::before,
-.scene-floor4 .hotspot::before {
+.scene-floor4 .hotspot::before,
+.scene-floor5 .hotspot::before {
   inset: -5px -7px;
   border: 2px solid rgba(229, 231, 235, 0.72);
   border-radius: 46% 54% 43% 57% / 54% 43% 57% 46%;
@@ -126,7 +130,8 @@
 .scene-floor1 .hotspot::after,
 .scene-floor2 .hotspot::after,
 .scene-floor3 .hotspot::after,
-.scene-floor4 .hotspot::after {
+.scene-floor4 .hotspot::after,
+.scene-floor5 .hotspot::after {
   left: 22px;
   bottom: -10px;
   width: 22px;
@@ -145,7 +150,9 @@
 .scene-floor3 .hotspot svg,
 .scene-floor3 .hotspot span,
 .scene-floor4 .hotspot svg,
-.scene-floor4 .hotspot span {
+.scene-floor4 .hotspot span,
+.scene-floor5 .hotspot svg,
+.scene-floor5 .hotspot span {
   position: relative;
   z-index: 1;
 }
@@ -153,7 +160,8 @@
 .scene-floor1 .hotspot svg,
 .scene-floor2 .hotspot svg,
 .scene-floor3 .hotspot svg,
-.scene-floor4 .hotspot svg {
+.scene-floor4 .hotspot svg,
+.scene-floor5 .hotspot svg {
   width: 14px;
   height: 14px;
 }
@@ -161,7 +169,8 @@
 .scene-floor1 .hotspot span,
 .scene-floor2 .hotspot span,
 .scene-floor3 .hotspot span,
-.scene-floor4 .hotspot span {
+.scene-floor4 .hotspot span,
+.scene-floor5 .hotspot span {
   font-size: 0.75rem;
   font-weight: 900;
   text-shadow: 0 1px 0 #000;
@@ -274,6 +283,41 @@
 .scene-floor4 .hotspot3 {
   left: 77%;
   top: 77%;
+}
+
+.scene-floor5 .sceneIllustration.managerRoom {
+  background-image: url("/floor-5-manager.png") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+.scene-floor5 .sceneIllustration.managerRoom > *:not(.hotspot):not(.sceneGlitch) {
+  display: none;
+}
+
+.scene-floor5 .sceneIllustration.managerRoom::before {
+  display: none;
+}
+
+.scene-floor5 .sceneIllustration.managerRoom::after {
+  z-index: 2;
+  background: none;
+}
+
+.scene-floor5 .hotspot1 {
+  left: 12%;
+  top: 15%;
+}
+
+.scene-floor5 .hotspot2 {
+  left: 82%;
+  top: 49%;
+}
+
+.scene-floor5 .hotspot3 {
+  left: 32%;
+  top: 46%;
 }
 
 @keyframes typewriterCursorBlink {
