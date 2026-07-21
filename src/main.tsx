@@ -345,17 +345,14 @@ function GameScene({
 
   return (
     <section className={`immersiveLayout glitchIn theme-${scene.image} scene-${scene.id} ${isEnding ? 'endingLayout' : ''}`}>
-      <div className="sceneColumn">
-        <div className="sceneFrame">
-          <SceneIllustration sceneClass={scene.image} hotspots={scene.hotspots} onObserve={onObserve} onPlaySound={onPlaySound} />
-          <div className="sceneHud">
-            <div>
-              <p className="kicker">{scene.floor ? `Floor ${scene.floor}` : scene.location}</p>
-              <h2>{scene.title}</h2>
-            </div>
+      <div className="sceneFrame">
+        <SceneIllustration sceneClass={scene.image} hotspots={scene.hotspots} onObserve={onObserve} onPlaySound={onPlaySound} />
+        <div className="sceneHud">
+          <div>
+            <p className="kicker">{scene.floor ? `Floor ${scene.floor}` : scene.location}</p>
+            <h2>{scene.title}</h2>
           </div>
         </div>
-
         <div className="objectiveBox typewriterNotice" aria-live="polite">
           <p className="kicker">What You Notice</p>
           <strong>
