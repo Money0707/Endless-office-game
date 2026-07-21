@@ -375,6 +375,7 @@ function GameScene({
         <ProgressIndicator scene={scene} />
         <Terminal lines={scene.terminal} />
 
+        {scene.options.length > 0 && <p className="choicesKicker">WHAT WILL YOU DO</p>}
         <div className="choicesList">
           {scene.options.map((option) => (
             <button className="choiceButton" key={option.key} onClick={() => onChoose(option.key)}>
@@ -401,9 +402,7 @@ function ProgressIndicator({ scene }: { scene: StoryScene }) {
   return (
     <div className="progressTrack" aria-label="Progress indicator">
       {[1, 2, 3, 4, 5].map((floor) => (
-        <span className={floor <= activeFloor ? 'active' : ''} key={floor}>
-          {floor}
-        </span>
+        <span className={floor <= activeFloor ? 'active' : ''} key={floor} aria-label={`Step ${floor}`} />
       ))}
     </div>
   );
