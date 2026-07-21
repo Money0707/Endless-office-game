@@ -29,7 +29,7 @@ const BAD_ENDING_LORE: LorePage[] = [
   {
     eyebrow: 'Story Core Setting',
     title: 'Unknown B Was Once Like You',
-    image: '/unknown-b-lore.png',
+    image: '/lore-page-1.png',
     body: [
       'Unknown B was once an ordinary employee at this company.',
       'Years ago, he stayed alone in the office after midnight, just like you. Two messages from unknown sources appeared on his computer. At the critical moment, he made the wrong choice: he replied.'
@@ -38,6 +38,7 @@ const BAD_ENDING_LORE: LorePage[] = [
   {
     eyebrow: 'The Swap',
     title: 'One Reply Changed Everything',
+    image: '/lore-page-2.png',
     body: [
       'The next second, the system completed an identity exchange.',
       'His employee file, name, face, and real-world identity were erased. His consciousness was trapped inside the company system.'
@@ -47,6 +48,7 @@ const BAD_ENDING_LORE: LorePage[] = [
   {
     eyebrow: 'The Rule',
     title: 'He Could Not Leave',
+    image: '/lore-page-3.png',
     body: [
       'From that moment on, he could only exist as Unknown B, sending messages through office computers and searching for someone to replace him.',
       'There was only one way out: another employee had to trust him, reply to him, and willingly create a connection.'
@@ -55,6 +57,7 @@ const BAD_ENDING_LORE: LorePage[] = [
   {
     eyebrow: 'The Trap',
     title: 'A New Body For An Old Prisoner',
+    image: '/lore-page-4.png',
     body: [
       'If someone replied, he could take their identity and return to the real world. The person who answered would become the new Unknown.',
       'He waited for years. Employees changed, systems updated, old laptops were thrown away, and new ones connected to the same server.'
@@ -63,6 +66,7 @@ const BAD_ENDING_LORE: LorePage[] = [
   {
     eyebrow: 'The Message',
     title: 'The Same Line, Again And Again',
+    image: '/lore-page-5.png',
     body: [
       'He kept sending the same message, night after night, waiting for one tired employee to believe him.'
     ],
@@ -71,6 +75,7 @@ const BAD_ENDING_LORE: LorePage[] = [
   {
     eyebrow: 'That Night',
     title: 'Then You Appeared',
+    image: '/lore-page-6.png',
     body: [
       'You thought Unknown B was helping you escape the office. You replied to him.',
       'The screen answered immediately.'
@@ -80,6 +85,7 @@ const BAD_ENDING_LORE: LorePage[] = [
   {
     eyebrow: 'The Reveal',
     title: 'He Was Never Saving You',
+    image: '/lore-page-7.png',
     body: [
       'The real Unknown B finally obtained your employee number, your face, your memories, and your body.',
       'He left the company wearing your identity. The next day, your coworkers still saw the same familiar person.'
