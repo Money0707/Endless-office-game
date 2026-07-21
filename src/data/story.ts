@@ -346,7 +346,8 @@ export const story: Record<SceneId, StoryScene> = {
     hotspots: [
       { id: 'elevator', label: 'Elevator display', clue: '12, 11, 10, 9... 3, 2, 1, Ground Floor.' },
       { id: 'sunlight', label: 'Sunlight', clue: 'Morning floods the lobby. Nothing follows you out.' },
-      { id: 'doors', label: 'Exit doors', clue: 'For once, they unlock without approval.' }
+      { id: 'doors', label: 'Exit doors', clue: 'For once, they unlock without approval.' },
+      { id: 'escaped', label: 'Escaped', clue: 'You have successfully escaped. See you tomorrow. ☺' }
     ]
   }
 };
