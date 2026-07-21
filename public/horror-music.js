@@ -1,9 +1,12 @@
 (() => {
+  const TRACK_SRC = '/The_Iron_Latch.mp3';
   let context = null;
   let master = null;
+  let track = null;
   let nodes = [];
   let timers = [];
   let started = false;
+  let synthStarted = false;
   let enabled = true;
 
   function getContext() {
@@ -16,7 +19,7 @@
 
   function tone(frequency, duration, gainValue, type = 'sine', delay = 0) {
     const ctx = getContext();
-    if (!ctx || !master || !enabled) return;
+    if (!ctx || !master || !enabled || !synthStarted) return;
 
     const oscillator = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -56,37 +59,36 @@
     nodes.push(oscillator, gain, lfo, lfoGain);
   }
 
-  function start() {
-    if (started || !enabled) return;
+  function startSynthFallback() {
+    if (synthStarted || !enabled) return;
     const ctx = getContext();
     if (!ctx) return;
 
-    started = true;
+    synthStarted = true;
     master = ctx.createGain();
     master.gain.setValueAtTime(0.0001, ctx.currentTime);
-    master.gain.exponentialRampToValueAtTime(0.032, ctx.currentTime + 1.2);
+    master.gain.exponentialRampToValueAtTime(0.026, ctx.currentTime + 1.2);
     master.connect(ctx.destination);
     nodes.push(master);
 
-    makeDrone(ctx, 31, 0.24, 'sine');
-    makeDrone(ctx, 38.7, 0.16, 'triangle');
-    makeDrone(ctx, 53.5, 0.055, 'sawtooth');
+    makeDrone(ctx, 31, 0.2, 'sine');
+    makeDrone(ctx, 38.7, 0.13, 'triangle');
+    makeDrone(ctx, 53.5, 0.045, 'sawtooth');
 
     timers.push(window.setInterval(() => {
       if (!enabled) return;
-      tone(740 + Math.random() * 260, 0.035, 0.012, 'triangle');
-      tone(46 + Math.random() * 14, 0.22, 0.026, 'sine', 0.05);
+      tone(740 + Math.random() * 260, 0.035, 0.01, 'triangle');
+      tone(46 + Math.random() * 14, 0.22, 0.022, 'sine', 0.05);
     }, 7200));
 
     timers.push(window.setInterval(() => {
       if (!enabled) return;
-      tone(27, 0.18, 0.04, 'sine');
-      tone(34, 0.2, 0.024, 'triangle', 0.24);
+      tone(27, 0.18, 0.034, 'sine');
+      tone(34, 0.2, 0.02, 'triangle', 0.24);
     }, 11800));
   }
 
-  function stop() {
-    enabled = false;
+  function stopSynthFallback() {
     timers.forEach((timer) => window.clearInterval(timer));
     timers = [];
 
@@ -112,8 +114,43 @@
       });
       nodes = [];
       master = null;
-      started = false;
+      synthStarted = false;
     }, 420);
+  }
+
+  function createTrack() {
+    const audio = new Audio(TRACK_SRC);
+    audio.loop = true;
+    audio.preload = 'auto';
+    audio.volume = 0.46;
+    audio.addEventListener('error', () => {
+      if (enabled) startSynthFallback();
+    }, { once: true });
+    return audio;
+  }
+
+  function start() {
+    if (started || !enabled) return;
+    started = true;
+
+    track = track || createTrack();
+    track.currentTime = track.currentTime || 0;
+    const playRequest = track.play();
+
+    if (playRequest && typeof playRequest.catch === 'function') {
+      playRequest.catch(() => {
+        if (enabled) startSynthFallback();
+      });
+    }
+  }
+
+  function stop() {
+    enabled = false;
+    if (track) {
+      track.pause();
+    }
+    stopSynthFallback();
+    started = false;
   }
 
   function startIfAllowed() {
