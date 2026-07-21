@@ -25,6 +25,11 @@ type LorePage = {
   image?: string;
 };
 
+type LoreSegment = {
+  kind: 'title' | 'body' | 'terminal';
+  text: string;
+};
+
 const BAD_ENDING_LORE: LorePage[] = [
   {
     eyebrow: 'Story Core Setting',
@@ -469,6 +474,7 @@ function GameScene({
             page={activeLorePage}
             pageNumber={BAD_ENDING_LORE.indexOf(activeLorePage) + 1}
             totalPages={BAD_ENDING_LORE.length}
+            onPlaySound={onPlaySound}
             onBack={() => {
               onPlaySound('click');
               setLorePage((value) => (value && value > 0 ? value - 1 : null));
@@ -523,26 +529,73 @@ function BadEndingLore({
   pageNumber,
   totalPages,
   onBack,
-  onNext
+  onNext,
+  onPlaySound
 }: {
   page: LorePage;
   pageNumber: number;
   totalPages: number;
   onBack: () => void;
   onNext: () => void;
+  onPlaySound: (event: SoundEvent) => void;
 }) {
   const isLastPage = pageNumber === totalPages;
+  const segments = useMemo<LoreSegment[]>(
+    () => [
+      { kind: 'title', text: page.title },
+      ...page.body.map((text) => ({ kind: 'body' as const, text })),
+      ...(page.terminal || []).map((text) => ({ kind: 'terminal' as const, text }))
+    ],
+    [page]
+  );
+  const fullLoreText = useMemo(() => segments.map((segment) => segment.text).join('\n\n'), [segments]);
+  const [typedLore, setTypedLore] = useState('');
+
+  useEffect(() => {
+    setTypedLore('');
+    let index = 0;
+    const timer = window.setInterval(() => {
+      index += 1;
+      setTypedLore(fullLoreText.slice(0, index));
+      const typedChar = fullLoreText[index - 1];
+      if (typedChar && typedChar.trim() && index % 2 === 0) {
+        onPlaySound('type');
+      }
+      if (index >= fullLoreText.length) {
+        window.clearInterval(timer);
+      }
+    }, 18);
+
+    return () => window.clearInterval(timer);
+  }, [fullLoreText, onPlaySound, pageNumber]);
+
+  const visibleSegments = getVisibleLoreSegments(segments, typedLore);
+  const terminalSegments = visibleSegments.filter((segment) => segment.kind === 'terminal' && segment.text);
 
   return (
     <article className="badEndingLore" aria-label="Bad ending story lore">
       <div className="lorePage" key={pageNumber}>
         {page.image && <img className="loreImage" src={page.image} alt="Unknown B trapped inside the company system" />}
         <p className="choicesKicker">{page.eyebrow}</p>
-        <h3>{page.title}</h3>
-        {page.body.map((line) => (
-          <p key={line}>{line}</p>
-        ))}
-        {page.terminal && <Terminal lines={page.terminal} />}
+        {visibleSegments.map((segment, index) => {
+          if (!segment.text || segment.kind === 'terminal') return null;
+          if (segment.kind === 'title') {
+            return (
+              <h3 key={`${segment.kind}-${index}`}>
+                {segment.text}
+                <span className="typewriterCursor" aria-hidden="true">_</span>
+              </h3>
+            );
+          }
+          return <p key={`${segment.kind}-${index}`}>{segment.text}</p>;
+        })}
+        {terminalSegments.length > 0 && (
+          <div className="terminalBox loreTerminalBox">
+            {terminalSegments.map((segment, index) => (
+              <span key={`${segment.text}-${index}`}>{segment.text}</span>
+            ))}
+          </div>
+        )}
       </div>
       <div className="loreControls">
         <button className="secondaryButton" onClick={onBack}>
@@ -555,6 +608,20 @@ function BadEndingLore({
       </div>
     </article>
   );
+}
+
+function getVisibleLoreSegments(segments: LoreSegment[], typedText: string) {
+  let cursor = 0;
+  return segments.map((segment, index) => {
+    const separatorLength = index === 0 ? 0 : 2;
+    cursor += separatorLength;
+    const visibleLength = Math.max(0, Math.min(segment.text.length, typedText.length - cursor));
+    cursor += segment.text.length;
+    return {
+      ...segment,
+      text: segment.text.slice(0, visibleLength)
+    };
+  });
 }
 
 function ProgressIndicator({ scene }: { scene: StoryScene }) {
