@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Eye, Maximize2, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import { START_SCENE, introScreen, story, type OptionKey, type SceneId, type StoryScene } from './data/story';
 import './styles.css';
+import './overrides.css';
 
 type RouteEntry = {
   scene: string;
@@ -267,7 +268,6 @@ function App() {
         <GameScene
           key={transitionKey}
           scene={scene}
-          route={route}
           observedClue={observedClue}
           onObserve={setObservedClue}
           onPlaySound={playSound}
@@ -312,7 +312,6 @@ function OpeningScreen({ onBegin }: { onBegin: () => void }) {
 
 function GameScene({
   scene,
-  route,
   observedClue,
   onObserve,
   onChoose,
@@ -320,7 +319,6 @@ function GameScene({
   onPlaySound
 }: {
   scene: StoryScene;
-  route: RouteEntry[];
   observedClue: string | null;
   onObserve: (clue: string) => void;
   onChoose: (key: OptionKey) => void;
@@ -328,29 +326,46 @@ function GameScene({
   onPlaySound: (event: SoundEvent) => void;
 }) {
   const isEnding = scene.id === 'trueEnding';
+  const noticeText = observedClue || scene.description;
+  const [typedNotice, setTypedNotice] = useState('');
+
+  useEffect(() => {
+    setTypedNotice('');
+    let index = 0;
+    const timer = window.setInterval(() => {
+      index += 1;
+      setTypedNotice(noticeText.slice(0, index));
+      if (index >= noticeText.length) {
+        window.clearInterval(timer);
+      }
+    }, 22);
+
+    return () => window.clearInterval(timer);
+  }, [noticeText]);
 
   return (
     <section className={`immersiveLayout glitchIn theme-${scene.image} scene-${scene.id} ${isEnding ? 'endingLayout' : ''}`}>
-      <div className="sceneFrame">
-        <SceneIllustration sceneClass={scene.image} hotspots={scene.hotspots} onObserve={onObserve} onPlaySound={onPlaySound} />
-        <div className="sceneHud">
-          <div>
-            <p className="kicker">{scene.floor ? `Floor ${scene.floor}` : scene.location}</p>
-            <h2>{scene.title}</h2>
+      <div className="sceneColumn">
+        <div className="sceneFrame">
+          <SceneIllustration sceneClass={scene.image} hotspots={scene.hotspots} onObserve={onObserve} onPlaySound={onPlaySound} />
+          <div className="sceneHud">
+            <div>
+              <p className="kicker">{scene.floor ? `Floor ${scene.floor}` : scene.location}</p>
+              <h2>{scene.title}</h2>
+            </div>
           </div>
-          <div className="timeBadge">{scene.timestamp}</div>
         </div>
-        <div className="ambientReadout">
-          <span>{scene.ambient}</span>
+
+        <div className="objectiveBox typewriterNotice" aria-live="polite">
+          <p className="kicker">What You Notice</p>
+          <strong>
+            {typedNotice}
+            <span className="typewriterCursor" aria-hidden="true">_</span>
+          </strong>
         </div>
       </div>
 
       <aside className="actionPanel">
-        <div className="objectiveBox">
-          <p className="kicker">What You Notice</p>
-          <strong>{observedClue || scene.description}</strong>
-        </div>
-
         <ProgressIndicator scene={scene} />
         <Terminal lines={scene.terminal} />
 
@@ -362,8 +377,6 @@ function GameScene({
             </button>
           ))}
         </div>
-
-        <PathLog route={route} />
 
         {isEnding && (
           <button className="secondaryButton" onClick={onRestart}>
@@ -444,26 +457,6 @@ function SceneIllustration({
           <span>{hotspot.label}</span>
         </button>
       ))}
-    </div>
-  );
-}
-
-function PathLog({ route }: { route: RouteEntry[] }) {
-  return (
-    <div className="pathLog">
-      <p className="kicker">Path</p>
-      {route.length === 0 ? (
-        <p className="muted">No choices recorded.</p>
-      ) : (
-        <ol>
-          {route.slice(-5).map((item, index) => (
-            <li key={`${item.scene}-${item.choice}-${index}`}>
-              <span>{item.scene} / {item.result}</span>
-              <strong>{item.choice}</strong>
-            </li>
-          ))}
-        </ol>
-      )}
     </div>
   );
 }
