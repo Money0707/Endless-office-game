@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="roomGlow" cx="50%" cy="48%" r="70%">
+      <stop offset="0" stop-color="#202226"/>
+      <stop offset="0.56" stop-color="#090a0c"/>
+      <stop offset="1" stop-color="#020203"/>
+    </radialGradient>
+    <linearGradient id="screen" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#23252a"/>
+      <stop offset="0.5" stop-color="#0d0f13"/>
+      <stop offset="1" stop-color="#050607"/>
+    </linearGradient>
+    <filter id="sketch">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7"/>
+      <feDisplacementMap in="SourceGraphic" scale="2.2"/>
+    </filter>
+    <filter id="softGlow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <pattern id="scratch" width="7" height="7" patternUnits="userSpaceOnUse">
+      <path d="M0 7 L7 0" stroke="#ffffff" stroke-opacity="0.035" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#roomGlow)"/>
+  <rect width="1600" height="1000" fill="url(#scratch)" opacity="0.9"/>
+
+  <g opacity="0.34" filter="url(#sketch)">
+    <circle cx="170" cy="100" r="100" fill="none" stroke="#686868" stroke-width="6"/>
+    <circle cx="170" cy="100" r="82" fill="none" stroke="#4b4b4b" stroke-width="2"/>
+    <path d="M170 100 L170 28 M170 100 L205 74" stroke="#6b6b6b" stroke-width="7" stroke-linecap="round"/>
+    <text x="118" y="122" fill="#777" font-size="58" font-family="Georgia">6</text>
+    <text x="120" y="68" fill="#666" font-size="44" font-family="Georgia">9</text>
+    <text x="250" y="122" fill="#666" font-size="44" font-family="Georgia">3</text>
+  </g>
+
+  <g opacity="0.72" filter="url(#sketch)">
+    <rect x="67" y="308" width="283" height="185" rx="8" fill="#030405" stroke="#202020" stroke-width="5"/>
+    <text x="132" y="424" fill="#8f1717" font-size="64" font-family="Courier New" filter="url(#softGlow)">12:08</text>
+    <text x="290" y="424" fill="#8f1717" font-size="31" font-family="Courier New">AM</text>
+    <path d="M110 590 C80 604 73 703 112 737 C168 784 282 774 303 710 C329 633 248 575 110 590Z" fill="#0b0b0b" stroke="#2b2b2b" stroke-width="4"/>
+    <path d="M102 598 C147 636 206 638 300 610" fill="none" stroke="#444" stroke-width="3" opacity="0.5"/>
+    <path d="M20 785 L355 735 L440 992 L33 1010Z" fill="#0e0e0e" stroke="#333" stroke-width="3"/>
+    <text x="73" y="825" fill="#555" font-size="30" font-family="Courier New">TO-DO:</text>
+    <text x="79" y="870" fill="#4f4f4f" font-size="28" font-family="Courier New">REPORT</text>
+    <text x="79" y="912" fill="#4f4f4f" font-size="28" font-family="Courier New">BUDGET</text>
+    <text x="79" y="954" fill="#4f4f4f" font-size="28" font-family="Courier New">CALL CLIENT</text>
+  </g>
+
+  <g filter="url(#sketch)">
+    <path d="M405 145 C498 117 1184 88 1265 139 C1315 171 1294 760 1260 794 C1208 847 505 846 424 794 C374 762 344 184 405 145Z" fill="#030405" stroke="#242424" stroke-width="10"/>
+    <path d="M448 194 C548 175 1149 158 1215 195 C1253 216 1242 698 1210 719 C1130 771 537 774 464 724 C435 704 411 213 448 194Z" fill="url(#screen)" stroke="#32343a" stroke-width="4"/>
+    <path d="M441 266 L1219 266" stroke="#2e3138" stroke-width="4" opacity="0.75"/>
+    <circle cx="527" cy="232" r="31" fill="#c6c9d0" opacity="0.8"/>
+    <circle cx="527" cy="221" r="13" fill="#8c9097"/>
+    <path d="M504 254 C515 239 538 239 551 254" fill="#8c9097"/>
+    <text x="590" y="246" fill="#d5d8df" font-size="31" font-family="Segoe UI, Arial">Unknown</text>
+    <text x="448" y="245" fill="#6676c8" font-size="34" font-weight="700" font-family="Arial">T</text>
+    <text x="486" y="340" fill="#81858d" font-size="20" font-family="Arial">UNKNOWN A</text>
+    <rect x="486" y="354" width="286" height="72" rx="9" fill="#202126" stroke="#353841"/>
+    <text x="513" y="401" fill="#d9dce3" font-size="32" font-family="Segoe UI, Arial">ARE YOU STILL THERE?</text>
+    <rect x="490" y="438" width="230" height="65" rx="9" fill="#181a1e" stroke="#2e3138"/>
+    <text x="519" y="480" fill="#d5d8df" font-size="30" font-family="Segoe UI, Arial">TYPING...</text>
+    <circle cx="641" cy="473" r="5" fill="#777"/><circle cx="666" cy="473" r="5" fill="#777"/><circle cx="691" cy="473" r="5" fill="#777"/>
+    <rect x="502" y="600" width="495" height="114" rx="8" fill="#0d0e11" stroke="#34363d"/>
+    <text x="525" y="654" fill="#9a9da4" font-size="28" font-family="Segoe UI, Arial">Type a message</text>
+    <path d="M520 690 C535 670 548 688 530 705" fill="none" stroke="#9ba0aa" stroke-width="3"/>
+    <circle cx="587" cy="687" r="12" fill="none" stroke="#9ba0aa" stroke-width="3"/>
+    <text x="961" y="692" fill="#c9ccd3" font-size="45" font-family="Arial">›</text>
+    <text x="1083" y="232" fill="#babdc4" font-size="36" font-family="Arial">⌕  ☎  ♙</text>
+    <text x="1087" y="690" fill="#777" font-size="29" font-family="Courier New">12:08 AM</text>
+  </g>
+
+  <g opacity="0.46" filter="url(#sketch)">
+    <rect x="1364" y="140" width="170" height="260" fill="#080808" stroke="#242424" stroke-width="4"/>
+    <text x="1387" y="205" fill="#4c4c4c" font-size="37" font-family="Georgia">DON'T</text>
+    <text x="1385" y="261" fill="#4c4c4c" font-size="34" font-family="Georgia">STAY</text>
+    <text x="1381" y="321" fill="#4c4c4c" font-size="33" font-family="Georgia">TOO LATE</text>
+    <rect x="1355" y="435" width="175" height="205" fill="#070707" stroke="#242424" stroke-width="4"/>
+    <text x="1390" y="499" fill="#4c4c4c" font-size="35" font-family="Georgia">TURN</text>
+    <text x="1388" y="555" fill="#4c4c4c" font-size="35" font-family="Georgia">OFF THE</text>
+    <text x="1394" y="610" fill="#4c4c4c" font-size="35" font-family="Georgia">LIGHTS</text>
+  </g>
+
+  <g opacity="0.68" filter="url(#sketch)">
+    <path d="M944 858 C968 791 1032 776 1078 804 C1091 744 1139 717 1181 747 C1194 697 1241 688 1260 732 C1275 780 1245 859 1186 908 C1118 964 996 964 944 858Z" fill="#19100e" stroke="#45302c" stroke-width="5"/>
+    <path d="M1016 828 C1056 831 1088 862 1110 906" fill="none" stroke="#58413b" stroke-width="5" opacity="0.6"/>
+    <path d="M1100 788 C1134 800 1164 836 1177 882" fill="none" stroke="#58413b" stroke-width="5" opacity="0.6"/>
+    <rect x="420" y="755" width="850" height="175" rx="18" fill="#050505" stroke="#1d1d1d" stroke-width="4" opacity="0.76"/>
+  </g>
+
+  <rect width="1600" height="1000" fill="black" opacity="0.18"/>
+  <rect width="1600" height="1000" fill="none" stroke="#111" stroke-width="16"/>
+</svg>
