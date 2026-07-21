@@ -140,7 +140,7 @@
 .sceneIllustration.floor1Main::after { z-index: 2; }
 
 .scene-floor2 .sceneIllustration.chatRoom {
-  background-image: url("/floor-2-chat.svg") !important;
+  background-image: url("/floor-2-chat.png") !important;
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
@@ -156,9 +156,7 @@
 
 .scene-floor2 .sceneIllustration.chatRoom::after {
   z-index: 2;
-  background:
-    radial-gradient(circle at 50% 48%, transparent 0 38%, rgba(0, 0, 0, 0.2) 88%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.18));
+  background: none;
 }
 
 .scene-floor2 .hotspot1 { left: 31%; top: 36%; }
