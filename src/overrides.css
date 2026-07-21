@@ -364,6 +364,11 @@
   top: 12%;
 }
 
+.scene-trueEnding .hotspot4 {
+  left: 74%;
+  top: 18%;
+}
+
 @keyframes typewriterCursorBlink {
   0%, 45% { opacity: 1; }
   46%, 100% { opacity: 0; }
