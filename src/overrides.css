@@ -367,19 +367,28 @@
   animation: badEndingRedFlicker 1.15s steps(2, end) infinite;
 }
 
+.scene-badEnding2 .hotspot {
+  min-height: 30px;
+  padding: 6px 10px;
+}
+
+.scene-badEnding2 .hotspot span {
+  font-size: 0.66rem;
+}
+
 .scene-badEnding2 .hotspot1 {
-  left: 21%;
-  top: 45%;
+  left: 8%;
+  top: 42%;
 }
 
 .scene-badEnding2 .hotspot2 {
-  left: 42%;
-  top: 48%;
+  left: 58%;
+  top: 41%;
 }
 
 .scene-badEnding2 .hotspot3 {
-  left: 33%;
-  top: 64%;
+  left: 30%;
+  top: 82%;
 }
 
 .scene-trueEnding .sceneIllustration.sunriseRoom {
