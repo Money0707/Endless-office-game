@@ -67,7 +67,7 @@ export const story: Record<SceneId, StoryScene> = {
     title: 'The Message',
     description:
       'You are about to close your laptop, but a message notification appears. The laptop clock shows 11:59 PM.',
-    image: 'messageRoom',
+    image: 'floor1Main',
     location: 'QA Department',
     timestamp: '11:59 PM',
     ambient: 'laptop fan / empty office / notification chime',
@@ -88,6 +88,7 @@ export const story: Record<SceneId, StoryScene> = {
       { id: 'floor', label: 'Dark office', clue: 'Every desk is empty, but one chair is not pushed in.' }
     ]
   },
+
   floor2: {
     id: 'floor2',
     floor: 2,
@@ -114,6 +115,7 @@ export const story: Record<SceneId, StoryScene> = {
       { id: 'keyboard', label: 'Keyboard', clue: 'Your draft reply is already typed: Who are you?' }
     ]
   },
+
   floor3: {
     id: 'floor3',
     floor: 3,
@@ -143,6 +145,7 @@ export const story: Record<SceneId, StoryScene> = {
       { id: 'booking', label: 'Room panel', clue: 'Meeting Room C. Status: EMPTY. Current Occupancy: 0.' }
     ]
   },
+
   floor4: {
     id: 'floor4',
     floor: 4,
@@ -170,6 +173,7 @@ export const story: Record<SceneId, StoryScene> = {
       { id: 'chairs', label: 'Missing chairs', clue: 'The chairs are gone. Their marks remain on the carpet.' }
     ]
   },
+
   floor5: {
     id: 'floor5',
     floor: 5,
@@ -202,6 +206,7 @@ export const story: Record<SceneId, StoryScene> = {
       { id: 'message', label: 'Unknown B', clue: "UNKNOWN B: Hey! I'm helping you! Reply to me." }
     ]
   },
+
   sceneA: {
     id: 'sceneA',
     title: 'The Floor Goes Dark',
@@ -222,6 +227,7 @@ export const story: Record<SceneId, StoryScene> = {
       { id: 'message', label: 'Same message', clue: 'Unknown A sends the same message again at exactly 11:59 PM.' }
     ]
   },
+
   sceneB: {
     id: 'sceneB',
     title: 'Why Did You Block Me?',
@@ -242,6 +248,7 @@ export const story: Record<SceneId, StoryScene> = {
       { id: 'clock', label: 'Clock', clue: 'The minute hand snaps backward to 11:59 PM.' }
     ]
   },
+
   sceneC: {
     id: 'sceneC',
     title: '0%',
@@ -261,6 +268,7 @@ export const story: Record<SceneId, StoryScene> = {
       { id: 'notification', label: 'New message', clue: 'UNKNOWN A is waiting at your desk again.' }
     ]
   },
+
   sceneD: {
     id: 'sceneD',
     title: 'Confidential Breach',
@@ -281,6 +289,7 @@ export const story: Record<SceneId, StoryScene> = {
       { id: 'printer', label: 'Printer', clue: 'It stops only when the clock returns to 11:59 PM.' }
     ]
   },
+
   badEnding: {
     id: 'badEnding',
     title: 'Bad Ending',
@@ -301,6 +310,7 @@ export const story: Record<SceneId, StoryScene> = {
       { id: 'message', label: 'New message', clue: 'From: You. Sent: Tomorrow. Time: 11:59 PM.' }
     ]
   },
+
   badEnding2: {
     id: 'badEnding2',
     title: 'Bad Ending 2',
@@ -318,6 +328,7 @@ export const story: Record<SceneId, StoryScene> = {
       { id: 'keyboard', label: 'Keyboard', clue: 'It keeps typing: Hey! I am helping you.' }
     ]
   },
+
   trueEnding: {
     id: 'trueEnding',
     title: 'True Ending',
