@@ -1,64 +1,66 @@
 .typewriterNotice {
   position: absolute;
-  left: 5%;
-  right: 5%;
-  bottom: 7%;
+  left: 4.6%;
+  right: auto;
+  bottom: 5.2%;
   z-index: 6;
-  min-height: 104px;
-  padding: 18px 22px;
+  width: min(46%, 440px);
+  min-height: 72px;
+  padding: 11px 14px 13px;
   border: 0;
   background:
-    radial-gradient(ellipse at 8% 8%, rgba(255, 255, 255, 0.08), transparent 22%),
-    linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.96) 8% 92%, transparent);
+    radial-gradient(ellipse at 14% 12%, rgba(255, 255, 255, 0.06), transparent 24%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.74) 74%, transparent);
   box-shadow:
-    0 -18px 28px rgba(0, 0, 0, 0.34),
-    0 18px 34px rgba(0, 0, 0, 0.55);
-  clip-path: polygon(2% 10%, 10% 0, 54% 6%, 94% 0, 100% 18%, 98% 86%, 90% 100%, 46% 94%, 7% 100%, 0 78%);
+    0 -8px 18px rgba(0, 0, 0, 0.22),
+    0 12px 24px rgba(0, 0, 0, 0.4);
+  clip-path: polygon(0 15%, 5% 6%, 28% 0, 82% 5%, 100% 18%, 97% 82%, 86% 96%, 39% 100%, 8% 92%, 0 74%);
 }
 
 .typewriterNotice::before,
 .typewriterNotice::after {
   content: "";
   position: absolute;
-  left: -1%;
-  right: -1%;
-  height: 18px;
+  left: -3%;
+  right: -8%;
   pointer-events: none;
-  background: rgba(0, 0, 0, 0.96);
-  filter: blur(6px);
+  background: rgba(0, 0, 0, 0.84);
+  filter: blur(5px);
 }
 
 .typewriterNotice::before {
-  top: -5px;
-  transform: rotate(-0.7deg);
+  top: -2px;
+  height: 12px;
+  transform: rotate(-0.9deg);
 }
 
 .typewriterNotice::after {
-  bottom: -4px;
-  transform: rotate(0.6deg);
+  bottom: -3px;
+  height: 14px;
+  transform: rotate(0.8deg);
 }
 
 .typewriterNotice .kicker {
   position: relative;
   z-index: 1;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
   color: #f59e0b;
-  font-size: 0.66rem;
-  letter-spacing: 0.2em;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
 }
 
 .typewriterNotice strong {
   position: relative;
   z-index: 1;
   display: block;
-  max-width: 88%;
-  min-height: 2.7em;
-  color: #dbe4ee;
+  max-width: 100%;
+  min-height: 2.4em;
+  color: #e3e8ef;
   font-family: "Courier New", monospace;
-  font-size: clamp(0.78rem, 1.7vw, 1.1rem);
-  letter-spacing: 0.02em;
-  line-height: 1.55;
-  text-shadow: 0 0 10px rgba(229, 231, 235, 0.2);
+  font-size: clamp(0.64rem, 1.08vw, 0.86rem);
+  letter-spacing: 0.015em;
+  line-height: 1.45;
+  text-shadow: 0 0 9px rgba(229, 231, 235, 0.24);
 }
 
 .typewriterCursor {
@@ -75,39 +77,61 @@
 }
 
 .scene-floor1 .hotspot {
-  min-height: 34px;
-  padding: 7px 12px;
-  border: 1px solid rgba(229, 231, 235, 0.64);
-  border-radius: 999px;
-  background:
-    linear-gradient(180deg, rgba(17, 24, 39, 0.88), rgba(0, 0, 0, 0.9));
+  min-height: 36px;
+  padding: 8px 15px;
+  border: 0;
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.82);
   color: #f8fafc;
   box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.75),
-    0 10px 20px rgba(0, 0, 0, 0.55);
+    inset 0 0 0 1px rgba(229, 231, 235, 0.72),
+    inset 0 0 0 3px rgba(0, 0, 0, 0.82),
+    0 0 0 1px rgba(229, 231, 235, 0.22),
+    0 10px 22px rgba(0, 0, 0, 0.58);
+  clip-path: polygon(4% 18%, 13% 4%, 86% 0, 98% 18%, 94% 82%, 82% 98%, 15% 93%, 0 72%);
 }
 
+.scene-floor1 .hotspot::before,
 .scene-floor1 .hotspot::after {
   content: "";
   position: absolute;
-  left: 20px;
-  bottom: -7px;
-  width: 14px;
-  height: 12px;
-  background: rgba(0, 0, 0, 0.92);
-  border-left: 1px solid rgba(229, 231, 235, 0.5);
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
-  transform: rotate(-28deg) skewX(-10deg);
+  pointer-events: none;
+}
+
+.scene-floor1 .hotspot::before {
+  inset: -5px -7px;
+  border: 2px solid rgba(229, 231, 235, 0.72);
+  border-radius: 46% 54% 43% 57% / 54% 43% 57% 46%;
+  transform: rotate(-1.8deg);
+  filter: blur(0.25px);
+  opacity: 0.85;
+}
+
+.scene-floor1 .hotspot::after {
+  left: 22px;
+  bottom: -10px;
+  width: 22px;
+  height: 15px;
+  border-left: 2px solid rgba(229, 231, 235, 0.72);
+  border-bottom: 2px solid rgba(229, 231, 235, 0.72);
+  background: rgba(0, 0, 0, 0.74);
+  transform: rotate(-25deg) skewX(-12deg);
+  clip-path: polygon(0 0, 100% 18%, 22% 100%);
 }
 
 .scene-floor1 .hotspot svg {
+  position: relative;
+  z-index: 1;
   width: 14px;
   height: 14px;
 }
 
 .scene-floor1 .hotspot span {
-  font-size: 0.76rem;
-  font-weight: 800;
+  position: relative;
+  z-index: 1;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-shadow: 0 1px 0 #000;
 }
 
 .scene-floor1 .hotspot1 {
@@ -141,20 +165,22 @@
 
 @media (max-width: 1040px) {
   .typewriterNotice {
+    width: min(58%, 460px);
     left: 4%;
-    right: 4%;
-    bottom: 5%;
+    bottom: 4.5%;
   }
 }
 
 @media (max-width: 720px) {
   .typewriterNotice {
-    min-height: 92px;
-    padding: 14px 16px;
+    width: calc(100% - 28px);
+    left: 14px;
+    bottom: 12px;
+    min-height: 78px;
+    padding: 11px 13px;
   }
 
   .typewriterNotice strong {
-    max-width: 100%;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
   }
 }
