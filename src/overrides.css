@@ -69,7 +69,7 @@
 }
 
 .immersiveLayout:has(.actionPanel.storybookMode) {
-  grid-template-columns: minmax(320px, 760px) !important;
+  grid-template-columns: minmax(320px, 860px) !important;
   justify-content: center;
 }
 
@@ -78,8 +78,8 @@
 }
 
 .immersiveLayout:has(.actionPanel.storybookMode) .actionPanel {
-  width: min(760px, calc(100vw - 34px));
-  max-width: 760px;
+  width: min(860px, calc(100vw - 34px));
+  max-width: 860px;
   justify-self: center;
   overflow: visible;
 }
@@ -114,9 +114,9 @@
 .loreImage {
   display: block;
   width: 100%;
-  max-height: 300px;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
+  height: auto;
+  max-height: min(52vh, 520px);
+  object-fit: contain;
   margin: 0 0 16px;
   border: 1px solid rgba(239, 68, 68, 0.42);
   background: #05070a;
