@@ -3,6 +3,43 @@
   line-height: 1.04;
 }
 
+.progressTrack {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.progressTrack span {
+  width: 8px !important;
+  height: 8px !important;
+  min-width: 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  overflow: hidden;
+  color: transparent !important;
+  background: rgba(71, 85, 105, 0.42) !important;
+  box-shadow: none !important;
+  text-indent: -999px;
+}
+
+.progressTrack span.active {
+  background: rgba(127, 29, 29, 0.88) !important;
+  box-shadow: 0 0 12px rgba(127, 29, 29, 0.4) !important;
+}
+
+.choicesKicker {
+  margin: 2px 0 10px;
+  color: #f59e0b;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
 .typewriterNotice {
   position: absolute;
   left: 4.6%;
