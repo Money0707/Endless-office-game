@@ -22,9 +22,9 @@
     card.className = 'investigationGate';
     card.setAttribute('aria-live', 'polite');
     card.innerHTML = `
-      <p class="gateKicker">Read The Scene First</p>
-      <h3>Click every eye icon to read the story.</h3>
-      <p class="gateCopy">The choices will appear after you inspect every clue on the left image.</p>
+      <p class="gateKicker">Notice What You Notice</p>
+      <h3>Click each eye icon to reveal the next clue.</h3>
+      <p class="gateCopy">Read all clues in the image first. The final choice will appear after the room is fully noticed.</p>
       <div class="gateProgress" aria-hidden="true"></div>
       <p class="gateCount"></p>
     `;
@@ -77,7 +77,7 @@
     card.hidden = false;
 
     const count = card.querySelector('.gateCount');
-    if (count) count.textContent = `${read} / ${total} clues read`;
+    if (count) count.textContent = `Clue ${Math.min(read + 1, total)} / ${total}. Click another eye icon.`;
 
     const progress = card.querySelector('.gateProgress');
     if (progress) {
