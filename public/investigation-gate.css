@@ -6,6 +6,19 @@
   display: none !important;
 }
 
+.typewriterNotice .kicker {
+  font-size: 0 !important;
+}
+
+.typewriterNotice .kicker::after {
+  content: "CLUE";
+  color: #f59e0b;
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
 .investigationGate {
   display: grid;
   gap: 12px;
@@ -48,6 +61,10 @@
   line-height: 1.5;
 }
 
+.gateCount {
+  color: #f8fafc;
+}
+
 .gateProgress {
   display: flex;
   gap: 10px;
@@ -71,7 +88,7 @@
 }
 
 .actionPanel.investigationLocked::after {
-  content: "Choices locked until the room has been fully read.";
+  content: "Notice what changes in the clue box. Keep clicking until every dot is lit.";
   margin-top: 8px;
   padding: 10px 12px;
   border: 1px solid rgba(148, 163, 184, 0.12);
