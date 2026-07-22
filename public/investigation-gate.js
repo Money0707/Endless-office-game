@@ -2,9 +2,19 @@
   const seenByScene = new Map();
   let lastSignature = '';
 
+  const floorOneClues = [
+    'No profile photo. No department. Sent from tomorrow.',
+    'The time reads 11:59 PM. The notification refuses to disappear.',
+    'Every desk is empty, but one chair is not pushed in.'
+  ];
+
   function getSceneKey(layout) {
     const classes = Array.from(layout.classList).filter((name) => name.startsWith('scene-') || name.startsWith('theme-'));
     return classes.sort().join('|') || layout.className;
+  }
+
+  function isFloorOne(layout) {
+    return layout.classList.contains('scene-floor1');
   }
 
   function getVisibleHotspots(layout) {
@@ -14,14 +24,30 @@
     });
   }
 
-  function ensureGateCard(panel) {
+  function setClueText(layout, text) {
+    if (!isFloorOne(layout)) return;
+    const clueBox = layout.querySelector('.typewriterNotice strong');
+    if (!clueBox) return;
+    clueBox.childNodes.forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE) node.textContent = '';
+    });
+    clueBox.insertBefore(document.createTextNode(text), clueBox.firstChild);
+  }
+
+  function ensureGateCard(panel, floorOne = false) {
     let card = panel.querySelector('.investigationGate');
     if (card) return card;
 
     card = document.createElement('section');
     card.className = 'investigationGate';
     card.setAttribute('aria-live', 'polite');
-    card.innerHTML = `
+    card.innerHTML = floorOne ? `
+      <p class="gateKicker">Notice What You Notice</p>
+      <h3>Read the clue, then click the matching object.</h3>
+      <p class="gateCopy">Start with the laptop. Each correct object reveals the next clue. The final choice appears after all clues are found.</p>
+      <div class="gateProgress" aria-hidden="true"></div>
+      <p class="gateCount"></p>
+    ` : `
       <p class="gateKicker">Notice What You Notice</p>
       <h3>Click each eye icon to reveal the next clue.</h3>
       <p class="gateCopy">Read all clues in the image first. The final choice will appear after the room is fully noticed.</p>
@@ -46,6 +72,7 @@
     if (!panel || !choices || panel.classList.contains('storybookMode')) return;
 
     const sceneKey = getSceneKey(layout);
+    const floorOne = isFloorOne(layout);
     const shouldGateScene = /scene-floor[1-5]/.test(sceneKey);
     const hotspots = getVisibleHotspots(layout);
     const choiceButtons = Array.from(choices.querySelectorAll('.choiceButton'));
@@ -62,7 +89,11 @@
     const total = labels.length;
     const read = labels.filter((label) => seen.has(label)).length;
     const unlocked = read >= total;
-    const signature = `${sceneKey}:${read}/${total}:${unlocked}`;
+    const signature = `${sceneKey}:${read}/${total}:${unlocked}:${floorOne}`;
+
+    if (floorOne && !unlocked) {
+      setClueText(layout, floorOneClues[Math.min(read, floorOneClues.length - 1)]);
+    }
 
     if (!force && signature === lastSignature) return;
     lastSignature = signature;
@@ -73,11 +104,15 @@
     }
 
     panel.classList.add('investigationLocked');
-    const card = ensureGateCard(panel);
+    const card = ensureGateCard(panel, floorOne);
     card.hidden = false;
 
     const count = card.querySelector('.gateCount');
-    if (count) count.textContent = `Clue ${Math.min(read + 1, total)} / ${total}. Click another eye icon.`;
+    if (count) {
+      count.textContent = floorOne
+        ? `Clue ${Math.min(read + 1, total)} / ${total}. Click the object that matches the clue.`
+        : `Clue ${Math.min(read + 1, total)} / ${total}. Click another eye icon.`;
+    }
 
     const progress = card.querySelector('.gateProgress');
     if (progress) {
@@ -100,7 +135,7 @@
     const seen = seenByScene.get(sceneKey) || new Set();
     seen.add(hotspot.getAttribute('aria-label') || hotspot.textContent || 'clue');
     seenByScene.set(sceneKey, seen);
-    window.setTimeout(() => updateGate(true), 60);
+    window.setTimeout(() => updateGate(true), 80);
   }, true);
 
   window.addEventListener('load', () => updateGate(true));
