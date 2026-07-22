@@ -1,5 +1,6 @@
 (() => {
   const seenByScene = new Map();
+  let lastSignature = '';
 
   function getSceneKey(layout) {
     const classes = Array.from(layout.classList).filter((name) => name.startsWith('scene-') || name.startsWith('theme-'));
@@ -9,7 +10,7 @@
   function getVisibleHotspots(layout) {
     return Array.from(layout.querySelectorAll('.sceneFrame .hotspot')).filter((button) => {
       const style = window.getComputedStyle(button);
-      return style.display !== 'none' && style.visibility !== 'hidden' && button.offsetParent !== null;
+      return style.display !== 'none' && style.visibility !== 'hidden' && button.getClientRects().length > 0;
     });
   }
 
@@ -31,7 +32,12 @@
     return card;
   }
 
-  function updateGate() {
+  function unlock(panel) {
+    panel.classList.remove('investigationLocked');
+    panel.querySelector('.investigationGate')?.remove();
+  }
+
+  function updateGate(force = false) {
     const layout = document.querySelector('.immersiveLayout');
     if (!layout) return;
 
@@ -39,38 +45,47 @@
     const choices = layout.querySelector('.choicesList');
     if (!panel || !choices || panel.classList.contains('storybookMode')) return;
 
+    const sceneKey = getSceneKey(layout);
+    const shouldGateScene = /scene-floor[1-5]/.test(sceneKey);
     const hotspots = getVisibleHotspots(layout);
     const choiceButtons = Array.from(choices.querySelectorAll('.choiceButton'));
-    const shouldGate = hotspots.length > 0 && choiceButtons.length > 0;
+    const shouldGate = shouldGateScene && hotspots.length > 0 && choiceButtons.length > 0;
 
     if (!shouldGate) {
-      panel.classList.remove('investigationLocked');
-      panel.querySelector('.investigationGate')?.remove();
+      unlock(panel);
+      lastSignature = sceneKey;
       return;
     }
 
-    const key = getSceneKey(layout);
-    const seen = seenByScene.get(key) || new Set();
-    const total = hotspots.length;
-    const read = Math.min(seen.size, total);
+    const seen = seenByScene.get(sceneKey) || new Set();
+    const labels = hotspots.map((hotspot) => hotspot.getAttribute('aria-label') || hotspot.textContent || 'clue');
+    const total = labels.length;
+    const read = labels.filter((label) => seen.has(label)).length;
     const unlocked = read >= total;
+    const signature = `${sceneKey}:${read}/${total}:${unlocked}`;
 
-    panel.classList.toggle('investigationLocked', !unlocked);
+    if (!force && signature === lastSignature) return;
+    lastSignature = signature;
 
+    if (unlocked) {
+      unlock(panel);
+      return;
+    }
+
+    panel.classList.add('investigationLocked');
     const card = ensureGateCard(panel);
-    card.hidden = unlocked;
+    card.hidden = false;
+
     const count = card.querySelector('.gateCount');
     if (count) count.textContent = `${read} / ${total} clues read`;
 
     const progress = card.querySelector('.gateProgress');
     if (progress) {
-      progress.innerHTML = '';
-      hotspots.forEach((hotspot) => {
+      progress.replaceChildren(...labels.map((label) => {
         const dot = document.createElement('span');
-        const label = hotspot.getAttribute('aria-label') || hotspot.textContent || '';
         dot.className = seen.has(label) ? 'read' : '';
-        progress.appendChild(dot);
-      });
+        return dot;
+      }));
     }
   }
 
@@ -81,16 +96,14 @@
     const layout = hotspot.closest('.immersiveLayout');
     if (!layout) return;
 
-    const key = getSceneKey(layout);
-    const seen = seenByScene.get(key) || new Set();
+    const sceneKey = getSceneKey(layout);
+    const seen = seenByScene.get(sceneKey) || new Set();
     seen.add(hotspot.getAttribute('aria-label') || hotspot.textContent || 'clue');
-    seenByScene.set(key, seen);
-    window.setTimeout(updateGate, 40);
+    seenByScene.set(sceneKey, seen);
+    window.setTimeout(() => updateGate(true), 60);
   }, true);
 
-  const observer = new MutationObserver(() => updateGate());
-  observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
-  window.addEventListener('load', updateGate);
-  window.addEventListener('resize', updateGate);
-  window.setInterval(updateGate, 700);
+  window.addEventListener('load', () => updateGate(true));
+  window.addEventListener('resize', () => updateGate(true));
+  window.setInterval(() => updateGate(false), 900);
 })();
