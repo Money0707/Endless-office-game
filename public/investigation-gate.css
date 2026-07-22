@@ -29,7 +29,7 @@
   box-shadow: none !important;
   clip-path: none !important;
   opacity: 1 !important;
-  cursor: help;
+  cursor: pointer;
 }
 
 .scene-floor1 .hotspot svg,
@@ -40,10 +40,12 @@
 }
 
 .scene-floor1 .hotspot:hover,
-.scene-floor1 .hotspot:focus-visible {
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.16), transparent 62%) !important;
-  box-shadow: 0 0 34px rgba(245, 158, 11, 0.18) !important;
-  outline: none;
+.scene-floor1 .hotspot:focus-visible,
+.scene-floor1 .hotspot:active {
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  outline: none !important;
 }
 
 .scene-floor1 .hotspot1 {
