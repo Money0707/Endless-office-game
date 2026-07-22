@@ -19,6 +19,54 @@
   text-transform: uppercase;
 }
 
+.scene-floor1 .hotspot {
+  min-width: 84px !important;
+  min-height: 62px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: transparent !important;
+  box-shadow: none !important;
+  clip-path: none !important;
+  opacity: 1 !important;
+  cursor: help;
+}
+
+.scene-floor1 .hotspot svg,
+.scene-floor1 .hotspot span,
+.scene-floor1 .hotspot::before,
+.scene-floor1 .hotspot::after {
+  display: none !important;
+}
+
+.scene-floor1 .hotspot:hover,
+.scene-floor1 .hotspot:focus-visible {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.16), transparent 62%) !important;
+  box-shadow: 0 0 34px rgba(245, 158, 11, 0.18) !important;
+  outline: none;
+}
+
+.scene-floor1 .hotspot1 {
+  left: 36% !important;
+  top: 44% !important;
+  width: 18% !important;
+  height: 15% !important;
+}
+
+.scene-floor1 .hotspot2 {
+  left: 2% !important;
+  top: 58% !important;
+  width: 20% !important;
+  height: 16% !important;
+}
+
+.scene-floor1 .hotspot3 {
+  left: 58% !important;
+  top: 50% !important;
+  width: 26% !important;
+  height: 28% !important;
+}
+
 .investigationGate {
   display: grid;
   gap: 12px;
@@ -97,6 +145,10 @@
   font-family: "Courier New", monospace;
   font-size: 0.68rem;
   line-height: 1.45;
+}
+
+.scene-floor1 .actionPanel.investigationLocked::after {
+  content: "Read the CLUE, click the matching object in the picture, then follow the next CLUE.";
 }
 
 @media (max-width: 720px) {
