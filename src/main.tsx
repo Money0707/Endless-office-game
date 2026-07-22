@@ -4,6 +4,7 @@ import { Eye, Maximize2, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import { START_SCENE, introScreen, story, type OptionKey, type SceneId, type StoryScene } from './data/story';
 import './styles.css';
 import './overrides.css';
+import './clean-overrides.css';
 
 type RouteEntry = {
   scene: string;
@@ -38,725 +39,538 @@ type LorePage = {
 };
 
 type LoreSegment = {
-  kind: 'title' | 'body' | 'terminal';
+  type: 'body' | 'terminal';
   text: string;
 };
 
-const BAD_ENDING_LORE: LorePage[] = [
+const badEndingLorePages: LorePage[] = [
   {
     eyebrow: 'Story Core Setting',
     title: 'Unknown B Was Once Like You',
-    image: '/lore-page-1.png',
+    image: '/story-core-1.png',
     body: [
       'Unknown B was once an ordinary employee at this company.',
-      'Years ago, he stayed alone in the office after midnight, just like you. Two messages from unknown sources appeared on his computer. At the critical moment, he made the wrong choice: he replied.'
-    ]
+      'Years ago, he stayed alone in the office after midnight, just like you. Two messages from unknown sources appeared on his computer. At the critical moment, he made the wrong choice: he replied.',
+    ],
   },
   {
     eyebrow: 'The Swap',
     title: 'One Reply Changed Everything',
-    image: '/lore-page-2.png',
+    image: '/story-core-2.png',
     body: [
       'The next second, the system completed an identity exchange.',
-      'His employee file, name, face, and real-world identity were erased. His consciousness was trapped inside the company system.'
+      'His employee file, name, face, and real-world identity were erased. His consciousness was trapped inside the company system.',
     ],
-    terminal: ['USER SWAPPED', 'YOU ARE NOW UNKNOWN B']
+    terminal: ['USER SWAPPED', 'YOU ARE NOW UNKNOWN B'],
   },
   {
     eyebrow: 'The Rule',
     title: 'He Could Not Leave',
-    image: '/lore-page-3.png',
+    image: '/story-core-3.png',
     body: [
       'From that moment on, he could only exist as Unknown B, sending messages through office computers and searching for someone to replace him.',
-      'There was only one way out: another employee had to trust him, reply to him, and willingly create a connection.'
-    ]
+      'There was only one way out: another employee had to trust him, reply to him, and willingly create a connection.',
+    ],
   },
   {
     eyebrow: 'The Trap',
     title: 'A New Body For An Old Prisoner',
-    image: '/lore-page-4.png',
+    image: '/story-core-4.png',
     body: [
       'If someone replied, he could take their identity and return to the real world. The person who answered would become the new Unknown.',
-      'He waited for years. Employees changed, systems updated, old laptops were thrown away, and new ones connected to the same server.'
-    ]
+      'He waited for years. Employees changed, systems updated, old laptops were thrown away, and new ones connected to the same server.',
+    ],
   },
   {
     eyebrow: 'The Message',
     title: 'The Same Line, Again And Again',
-    image: '/lore-page-5.png',
+    image: '/story-core-5.png',
     body: [
-      'He kept sending the same message, night after night, waiting for one tired employee to believe him.'
+      'He kept sending the same message, night after night, waiting for one tired employee to believe him.',
     ],
-    terminal: ["HEY! I'M HELPING YOU!", 'REPLY TO ME.']
+    terminal: ["HEY! I'M HELPING YOU!", 'REPLY TO ME.'],
   },
   {
     eyebrow: 'That Night',
     title: 'Then You Appeared',
-    image: '/lore-page-6.png',
+    image: '/story-core-6.png',
     body: [
       'You thought Unknown B was helping you escape the office. You replied to him.',
-      'The screen answered immediately.'
+      'The screen answered immediately.',
     ],
-    terminal: ['UNKNOWN B: THANK YOU.', 'USER SWAPPED', 'YOU ARE NOW UNKNOWN B']
+    terminal: ['UNKNOWN B: THANK YOU.', 'USER SWAPPED', 'YOU ARE NOW UNKNOWN B'],
   },
   {
     eyebrow: 'The Reveal',
     title: 'He Was Never Saving You',
-    image: '/lore-page-7.png',
+    image: '/story-core-7.png',
     body: [
       'The real Unknown B finally obtained your employee number, your face, your memories, and your body.',
-      'He left the company wearing your identity. The next day, your coworkers still saw the same familiar person.'
-    ]
+      'He left the company wearing your identity. The next day, your coworkers still saw the same familiar person.',
+    ],
   },
   {
     eyebrow: 'The New Unknown',
     title: 'Now You Wait',
     body: [
       'Deep inside the computer system, you are trapped in a virtual office with no exit. Time is frozen at 11:59 PM.',
-      'Now you understand: Unknown B was not trying to save you. He was looking for a replacement.'
+      'Now you understand: Unknown B was not trying to save you. He was looking for a replacement.',
     ],
-    terminal: ['IDENTITY TRANSFER COMPLETE', 'PREVIOUS USER: RELEASED', 'CURRENT USER: UNKNOWN B', 'WAITING FOR NEXT CONNECTION...']
-  }
+    terminal: [
+      'IDENTITY TRANSFER COMPLETE',
+      'PREVIOUS USER: RELEASED',
+      'CURRENT USER: UNKNOWN B',
+      'WAITING FOR NEXT CONNECTION...',
+    ],
+  },
 ];
 
-function App() {
-  const [mode, setMode] = useState<'intro' | 'playing'>('intro');
+const loreSegments = (page: LorePage): LoreSegment[] => [
+  ...page.body.map((text) => ({ type: 'body' as const, text })),
+  ...(page.terminal?.map((text) => ({ type: 'terminal' as const, text })) ?? []),
+];
+
+const TYPEWRITER_SPEED_MS = 28;
+
+const clickSound = () => playSound('click');
+const observeSound = () => playSound('observe');
+const progressSound = () => playSound('progress');
+const loopSound = () => playSound('loop');
+const badSound = () => playSound('bad');
+const trueSound = () => playSound('true');
+const restartSound = () => playSound('restart');
+
+const playSound = (event: SoundEvent) => {
+  window.dispatchEvent(new CustomEvent('office-sound', { detail: event }));
+};
+
+const App = () => {
   const [sceneId, setSceneId] = useState<SceneId>(START_SCENE);
-  const [route, setRoute] = useState<RouteEntry[]>([]);
-  const [soundOn, setSoundOn] = useState(true);
-  const [observedClue, setObservedClue] = useState<string | null>(null);
-  const [transitionKey, setTransitionKey] = useState(0);
-  const [shattering, setShattering] = useState(false);
-  const audioRef = useRef<{ context: AudioContext } | null>(null);
-
-  const scene = story[sceneId];
-  const isBadState = sceneId === 'badEnding' || sceneId === 'badEnding2' || sceneId.startsWith('scene');
-
-  function ensureAudioContext() {
-    const AudioContextCtor = window.AudioContext || (window as unknown as AudioContextLike).webkitAudioContext;
-    if (!AudioContextCtor) return null;
-
-    const context = audioRef.current?.context || new AudioContextCtor();
-    if (context.state === 'suspended') {
-      void context.resume();
-    }
-    audioRef.current = { context };
-    return context;
-  }
-
-  function playTone(
-    context: AudioContext,
-    frequency: number,
-    duration: number,
-    gainValue: number,
-    type: OscillatorType = 'sine',
-    delay = 0
-  ) {
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    const start = context.currentTime + delay;
-    const end = start + duration;
-
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, start);
-    gain.gain.setValueAtTime(0.0001, start);
-    gain.gain.exponentialRampToValueAtTime(gainValue, start + 0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001, end);
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-    oscillator.start(start);
-    oscillator.stop(end + 0.02);
-  }
-
-  function playSound(event: SoundEvent, force = false) {
-    if (!soundOn && !force) return;
-
-    const context = ensureAudioContext();
-    if (!context) return;
-
-    if (event === 'type') {
-      playTone(context, 820 + Math.random() * 140, 0.018, 0.006, 'square');
-      return;
-    }
-
-    if (event === 'message') {
-      playTone(context, 640, 0.05, 0.018, 'square');
-      playTone(context, 310, 0.055, 0.016, 'sawtooth', 0.055);
-      playTone(context, 980, 0.028, 0.012, 'triangle', 0.13);
-      playTone(context, 48, 0.2, 0.018, 'sine', 0.15);
-      return;
-    }
-
-    if (event === 'buzz') {
-      playTone(context, 54 + Math.random() * 18, 0.055, 0.035, 'sawtooth');
-      playTone(context, 118 + Math.random() * 30, 0.035, 0.014, 'square', 0.045);
-      playTone(context, 42, 0.12, 0.018, 'sine', 0.08);
-      return;
-    }
-
-    if (event === 'heartbeat') {
-      playTone(context, 46, 0.16, 0.07, 'sine');
-      playTone(context, 38, 0.18, 0.05, 'triangle', 0.18);
-      playTone(context, 44, 0.2, 0.06, 'sine', 0.58);
-      playTone(context, 34, 0.22, 0.04, 'triangle', 0.78);
-      return;
-    }
-
-    if (event === 'click') {
-      playTone(context, 132, 0.055, 0.035, 'triangle');
-      playTone(context, 72, 0.08, 0.025, 'sine');
-      return;
-    }
-
-    if (event === 'observe') {
-      playTone(context, 96, 0.055, 0.018, 'sine');
-      playTone(context, 144, 0.05, 0.01, 'triangle', 0.035);
-      return;
-    }
-
-    if (event === 'progress') {
-      playTone(context, 88, 0.1, 0.026, 'sine');
-      playTone(context, 132, 0.11, 0.018, 'triangle', 0.06);
-      return;
-    }
-
-    if (event === 'loop' || event === 'bad') {
-      playTone(context, event === 'bad' ? 42 : 54, 0.3, event === 'bad' ? 0.055 : 0.04, 'sine');
-      playTone(context, 30, 0.34, 0.028, 'triangle', 0.04);
-      return;
-    }
-
-    if (event === 'glass') {
-      playTone(context, 740, 0.045, 0.012, 'triangle', 0.08);
-      playTone(context, 1180, 0.035, 0.009, 'sine', 0.22);
-      playTone(context, 920, 0.04, 0.008, 'triangle', 0.36);
-      playTone(context, 1480, 0.026, 0.006, 'sine', 0.54);
-      playTone(context, 166, 0.18, 0.012, 'sine', 0.7);
-      return;
-    }
-
-    if (event === 'true') {
-      playTone(context, 196, 0.14, 0.025, 'sine');
-      playTone(context, 247, 0.16, 0.024, 'sine', 0.11);
-      playTone(context, 330, 0.24, 0.022, 'triangle', 0.25);
-      return;
-    }
-
-    if (event === 'restart') {
-      playTone(context, 88, 0.12, 0.035, 'triangle');
-    }
-  }
-
-  useEffect(() => {
-    if (!soundOn || mode === 'intro') return;
-
-    const AudioContextCtor = window.AudioContext || (window as unknown as AudioContextLike).webkitAudioContext;
-    if (!AudioContextCtor) return;
-
-    const context = audioRef.current?.context || new AudioContextCtor();
-    const drone = context.createOscillator();
-    const tremor = context.createOscillator();
-    const gain = context.createGain();
-    const tremorGain = context.createGain();
-
-    drone.type = 'sine';
-    drone.frequency.value = sceneId === 'trueEnding' ? 52 : 38 + (scene.floor || 1) * 3;
-    tremor.type = 'triangle';
-    tremor.frequency.value = sceneId === 'trueEnding' ? 2 : 4.5;
-    gain.gain.value = sceneId === 'trueEnding' ? 0.01 : 0.018;
-    tremorGain.gain.value = 0.008;
-
-    tremor.connect(tremorGain);
-    tremorGain.connect(gain.gain);
-    drone.connect(gain);
-    gain.connect(context.destination);
-    drone.start();
-    tremor.start();
-    audioRef.current = { context };
-
-    return () => {
-      drone.stop();
-      tremor.stop();
-      drone.disconnect();
-      tremor.disconnect();
-      gain.disconnect();
-      tremorGain.disconnect();
-    };
-  }, [soundOn, mode, sceneId, isBadState, scene.floor, transitionKey]);
-
-  useEffect(() => {
-    if (!soundOn || mode === 'intro') return;
-
-    const hasUnknownMessage = scene.terminal.some((line) => /UNKNOWN|MESSAGE|USER SWAPPED/i.test(line));
-    if (hasUnknownMessage) {
-      playSound('message');
-    }
-
-    if (sceneId !== 'badEnding2') return;
-
-    playSound('buzz');
-    const timer = window.setInterval(() => playSound('buzz'), 1150);
-    return () => window.clearInterval(timer);
-  }, [soundOn, mode, sceneId, transitionKey]);
-
-  const status = useMemo(() => {
-    if (mode === 'intro') return 'Shift not started';
-    if (sceneId === 'trueEnding') return 'Escaped';
-    if (isBadState) return 'Time loop detected';
-    return `Floor ${scene.floor} / 5`;
-  }, [mode, scene, sceneId, isBadState]);
-
-  function beginShift() {
-    playSound('progress');
-    setMode('playing');
-    setSceneId(START_SCENE);
-    setRoute([]);
-    setObservedClue(null);
-    setTransitionKey((value) => value + 1);
-  }
-
-  function choose(key: OptionKey) {
-    const option = scene.options.find((item) => item.key === key);
-    const outcome = scene.outcomes[key];
-    if (!option || !outcome) return;
-
-    if (outcome.nextId === 'restart') {
-      playSound('restart');
-      restart();
-      return;
-    }
-
-    if (outcome.result === 'bad') {
-      playSound('heartbeat');
-      window.setTimeout(() => playSound('bad'), 420);
-    } else {
-      playSound(outcome.result === 'true' ? 'true' : outcome.result === 'loop' ? 'loop' : 'progress');
-    }
-
-    setRoute((current) => [
-      ...current,
-      {
-        scene: scene.title,
-        choice: `${option.key}. ${option.label}`,
-        result: outcome.result
-      }
-    ]);
-
-    if (outcome.result === 'restart' && outcome.nextId === START_SCENE) {
-      playSound('glass');
-      setShattering(true);
-      setObservedClue(outcome.text);
-      window.setTimeout(() => {
-        setSceneId(START_SCENE);
-        setObservedClue(null);
-        setTransitionKey((value) => value + 1);
-        setShattering(false);
-      }, 2400);
-      return;
-    }
-
-    setSceneId(outcome.nextId);
-    setObservedClue(outcome.text);
-    setTransitionKey((value) => value + 1);
-  }
-
-  function restart() {
-    playSound('restart');
-    setMode('intro');
-    setSceneId(START_SCENE);
-    setRoute([]);
-    setObservedClue(null);
-    setShattering(false);
-    setTransitionKey((value) => value + 1);
-  }
-
-  function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen?.();
-      return;
-    }
-    document.exitFullscreen?.();
-  }
-
-  function toggleSound() {
-    const nextSoundState = !soundOn;
-    setSoundOn(nextSoundState);
-    if (nextSoundState) {
-      const context = ensureAudioContext();
-      if (context) {
-        playTone(context, 176, 0.08, 0.03, 'triangle');
-        playTone(context, 220, 0.1, 0.024, 'sine', 0.08);
-      }
-    }
-  }
-
-  return (
-    <main className={`gameShell ${isBadState ? 'dangerMode' : ''}`}>
-      <div className="noiseLayer" />
-      <div className="scanlineLayer" />
-      <div className="fogLayer" />
-      {shattering && <GlassShatter />}
-
-      <header className="gameHeader">
-        <div>
-          <p className="kicker">Office</p>
-          <h1>The Endless Shift</h1>
-        </div>
-        <div className="headerActions">
-          <span className="status">{status}</span>
-          <button className="iconButton" onClick={toggleSound} aria-label="Toggle sound">
-            {soundOn ? <Volume2 size={18} /> : <VolumeX size={18} />}
-          </button>
-          <button className="iconButton" onClick={toggleFullscreen} aria-label="Fullscreen">
-            <Maximize2 size={18} />
-          </button>
-        </div>
-      </header>
-
-      {mode === 'intro' && <OpeningScreen onBegin={beginShift} />}
-      {mode === 'playing' && (
-        <GameScene
-          key={transitionKey}
-          scene={scene}
-          observedClue={observedClue}
-          onObserve={setObservedClue}
-          onPlaySound={playSound}
-          onChoose={choose}
-          onRestart={restart}
-        />
-      )}
-    </main>
-  );
-}
-
-function GlassShatter() {
-  return (
-    <div className="glassShatter" aria-hidden="true">
-      {Array.from({ length: 22 }, (_, index) => (
-        <span key={index} />
-      ))}
-    </div>
-  );
-}
-
-function OpeningScreen({ onBegin }: { onBegin: () => void }) {
-  return (
-    <section className="openingScreen glitchIn">
-      <SceneIllustration sceneClass="introRoom" hotspots={[]} />
-      <article className="openingOverlay">
-        <p className="kicker">{introScreen.eyebrow}</p>
-        <h2>{introScreen.title}</h2>
-        <div className="openingBeats" aria-label="Opening story">
-          {introScreen.beats.map((beat) => (
-            <span key={beat}>{beat}</span>
-          ))}
-        </div>
-        <Terminal lines={introScreen.terminal} />
-        <button className="primaryButton" onClick={onBegin}>
-          {introScreen.button}
-        </button>
-      </article>
-    </section>
-  );
-}
-
-function GameScene({
-  scene,
-  observedClue,
-  onObserve,
-  onChoose,
-  onRestart,
-  onPlaySound
-}: {
-  scene: StoryScene;
-  observedClue: string | null;
-  onObserve: (clue: string) => void;
-  onChoose: (key: OptionKey) => void;
-  onRestart: () => void;
-  onPlaySound: (event: SoundEvent) => void;
-}) {
-  const isEnding = scene.id === 'trueEnding';
-  const isBadEnding2 = scene.id === 'badEnding2';
-  const noticeText = observedClue || scene.description;
+  const [history, setHistory] = useState<RouteEntry[]>([]);
+  const [muted, setMuted] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [started, setStarted] = useState(false);
   const [typedNotice, setTypedNotice] = useState('');
-  const [lorePage, setLorePage] = useState<number | null>(null);
-  const activeLorePage = lorePage === null ? null : BAD_ENDING_LORE[lorePage];
+  const [displayNotice, setDisplayNotice] = useState('');
+  const [typeTick, setTypeTick] = useState(0);
+  const [loreOpen, setLoreOpen] = useState(false);
+  const [lorePage, setLorePage] = useState(0);
+  const [loreTyped, setLoreTyped] = useState('');
+  const [loreTick, setLoreTick] = useState(0);
+  const audioRef = useRef<AudioContextLike | null>(null);
+  const bgRef = useRef<{ oscillators: OscillatorNode[]; gain: GainNode } | null>(null);
+  const scene = story[sceneId];
+  const currentLorePage = badEndingLorePages[lorePage];
+  const currentLoreSegments = useMemo(() => loreSegments(currentLorePage), [currentLorePage]);
+  const currentLoreText = useMemo(
+    () => currentLoreSegments.map((segment) => segment.text).join('\n'),
+    [currentLoreSegments]
+  );
+
+  const initAudio = () => {
+    if (!audioRef.current) {
+      const AudioCtor = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      audioRef.current = new AudioCtor() as AudioContextLike;
+    }
+
+    if (audioRef.current.state === 'suspended') {
+      audioRef.current.resume();
+    }
+  };
+
+  const playTone = (frequency: number, duration = 0.12, type: OscillatorType = 'sine', volume = 0.04) => {
+    if (muted) return;
+    initAudio();
+    const ctx = audioRef.current;
+    if (!ctx) return;
+
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    oscillator.type = type;
+    oscillator.frequency.value = frequency;
+    gain.gain.setValueAtTime(volume, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+    oscillator.start();
+    oscillator.stop(ctx.currentTime + duration);
+  };
+
+  const playNoise = (duration = 0.18, volume = 0.05) => {
+    if (muted) return;
+    initAudio();
+    const ctx = audioRef.current;
+    if (!ctx) return;
+
+    const bufferSize = ctx.sampleRate * duration;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i += 1) {
+      output[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+    }
+    const noise = ctx.createBufferSource();
+    const gain = ctx.createGain();
+    gain.gain.value = volume;
+    noise.buffer = buffer;
+    noise.connect(gain);
+    gain.connect(ctx.destination);
+    noise.start();
+  };
+
+  const startBackground = () => {
+    if (muted || bgRef.current) return;
+    initAudio();
+    const ctx = audioRef.current;
+    if (!ctx) return;
+
+    const gain = ctx.createGain();
+    gain.gain.value = 0.012;
+    const oscillators = [36, 43, 51].map((frequency) => {
+      const oscillator = ctx.createOscillator();
+      oscillator.type = 'sawtooth';
+      oscillator.frequency.value = frequency;
+      oscillator.connect(gain);
+      oscillator.start();
+      return oscillator;
+    });
+    gain.connect(ctx.destination);
+    bgRef.current = { oscillators, gain };
+  };
+
+  const stopBackground = () => {
+    bgRef.current?.oscillators.forEach((oscillator) => oscillator.stop());
+    bgRef.current?.gain.disconnect();
+    bgRef.current = null;
+  };
 
   useEffect(() => {
-    setLorePage(null);
-  }, [scene.id]);
+    const listener = (event: Event) => {
+      const soundEvent = (event as CustomEvent<SoundEvent>).detail;
+      if (soundEvent === 'click') playTone(680, 0.07, 'square', 0.025);
+      if (soundEvent === 'observe') {
+        playTone(330, 0.09, 'triangle', 0.02);
+        playTone(110, 0.18, 'sine', 0.018);
+      }
+      if (soundEvent === 'progress') {
+        playTone(490, 0.12, 'triangle', 0.03);
+        setTimeout(() => playTone(735, 0.1, 'triangle', 0.025), 90);
+      }
+      if (soundEvent === 'loop') {
+        playTone(90, 0.3, 'sawtooth', 0.04);
+        playNoise(0.22, 0.035);
+      }
+      if (soundEvent === 'bad') {
+        playNoise(0.45, 0.07);
+        playTone(58, 0.8, 'sawtooth', 0.055);
+      }
+      if (soundEvent === 'true') {
+        playTone(220, 0.16, 'sine', 0.025);
+        setTimeout(() => playTone(330, 0.22, 'sine', 0.02), 120);
+      }
+      if (soundEvent === 'restart') playTone(180, 0.16, 'square', 0.03);
+      if (soundEvent === 'glass') playNoise(0.28, 0.04);
+      if (soundEvent === 'type') {
+        playTone(520 + Math.random() * 120, 0.028, 'square', 0.009);
+      }
+      if (soundEvent === 'message') {
+        playTone(880, 0.08, 'triangle', 0.025);
+        setTimeout(() => playTone(660, 0.08, 'triangle', 0.02), 90);
+      }
+      if (soundEvent === 'buzz') {
+        playTone(72, 0.35, 'sawtooth', 0.035);
+        playNoise(0.2, 0.025);
+      }
+      if (soundEvent === 'heartbeat') {
+        playTone(48, 0.11, 'sine', 0.04);
+        setTimeout(() => playTone(44, 0.16, 'sine', 0.032), 150);
+      }
+    };
+
+    window.addEventListener('office-sound', listener);
+    return () => window.removeEventListener('office-sound', listener);
+  }, [muted]);
 
   useEffect(() => {
+    window.dispatchEvent(new CustomEvent('office-muted', { detail: muted }));
+    if (muted) {
+      stopBackground();
+    } else if (started) {
+      startBackground();
+    }
+  }, [muted, started]);
+
+  useEffect(() => {
+    setLoreOpen(false);
+    setLorePage(0);
+    if (!started) return;
+    setDisplayNotice(scene.description);
+    setTypedNotice('');
+    setTypeTick((tick) => tick + 1);
+    if (scene.result === 'bad') badSound();
+    else if (scene.result === 'true') trueSound();
+    else if (scene.result === 'loop') loopSound();
+    else if (scene.id === 'floor2') playSound('message');
+  }, [sceneId, started]);
+
+  useEffect(() => {
+    if (!started) return;
+    const tick = typeTick;
     setTypedNotice('');
     let index = 0;
     const timer = window.setInterval(() => {
       index += 1;
-      setTypedNotice(noticeText.slice(0, index));
-      const typedChar = noticeText[index - 1];
-      if (typedChar && typedChar.trim() && index % 2 === 0) {
-        onPlaySound('type');
-      }
-      if (index >= noticeText.length) {
+      if (index % 2 === 0) playSound('type');
+      setTypedNotice(displayNotice.slice(0, index));
+      if (index >= displayNotice.length || tick !== typeTick) {
         window.clearInterval(timer);
       }
-    }, 22);
+    }, TYPEWRITER_SPEED_MS);
 
     return () => window.clearInterval(timer);
-  }, [noticeText, onPlaySound]);
-
-  return (
-    <section className={`immersiveLayout glitchIn theme-${scene.image} scene-${scene.id} ${isEnding ? 'endingLayout' : ''}`}>
-      <div className="sceneFrame">
-        <SceneIllustration sceneClass={scene.image} hotspots={scene.hotspots} onObserve={onObserve} onPlaySound={onPlaySound} />
-        <div className="sceneHud">
-          <div>
-            <p className="kicker">{scene.floor ? `Floor ${scene.floor}` : scene.location}</p>
-            <h2>{scene.title}</h2>
-          </div>
-        </div>
-        <div className="objectiveBox typewriterNotice" aria-live="polite">
-          <p className="kicker">What You Notice</p>
-          <strong>
-            {typedNotice}
-            <span className="typewriterCursor" aria-hidden="true">_</span>
-          </strong>
-        </div>
-      </div>
-
-      <aside className={`actionPanel ${activeLorePage ? 'storybookMode' : ''}`}>
-        {activeLorePage ? (
-          <BadEndingLore
-            page={activeLorePage}
-            pageNumber={BAD_ENDING_LORE.indexOf(activeLorePage) + 1}
-            totalPages={BAD_ENDING_LORE.length}
-            onPlaySound={onPlaySound}
-            onBack={() => {
-              onPlaySound('click');
-              setLorePage((value) => (value && value > 0 ? value - 1 : null));
-            }}
-            onNext={() => {
-              onPlaySound('click');
-              setLorePage((value) => (value === null || value >= BAD_ENDING_LORE.length - 1 ? null : value + 1));
-            }}
-          />
-        ) : (
-          <>
-            <ProgressIndicator scene={scene} />
-            <Terminal lines={scene.terminal} />
-
-            {scene.options.length > 0 && <p className="choicesKicker">WHAT WILL YOU DO</p>}
-            <div className="choicesList">
-              {scene.options.map((option) => (
-                <button className="choiceButton" key={option.key} onClick={() => onChoose(option.key)}>
-                  <span className="choiceKey">{option.key}</span>
-                  <strong>{option.label}</strong>
-                </button>
-              ))}
-            </div>
-
-            {isBadEnding2 && (
-              <button
-                className="secondaryButton loreButton"
-                onClick={() => {
-                  onPlaySound('observe');
-                  setLorePage(0);
-                }}
-              >
-                Story Core Setting
-              </button>
-            )}
-
-            {isEnding && (
-              <button className="secondaryButton" onClick={onRestart}>
-                <RotateCcw size={17} />
-                Opening Screen
-              </button>
-            )}
-          </>
-        )}
-      </aside>
-    </section>
-  );
-}
-
-function BadEndingLore({
-  page,
-  pageNumber,
-  totalPages,
-  onBack,
-  onNext,
-  onPlaySound
-}: {
-  page: LorePage;
-  pageNumber: number;
-  totalPages: number;
-  onBack: () => void;
-  onNext: () => void;
-  onPlaySound: (event: SoundEvent) => void;
-}) {
-  const isLastPage = pageNumber === totalPages;
-  const segments = useMemo<LoreSegment[]>(
-    () => [
-      { kind: 'title', text: page.title },
-      ...page.body.map((text) => ({ kind: 'body' as const, text })),
-      ...(page.terminal || []).map((text) => ({ kind: 'terminal' as const, text }))
-    ],
-    [page]
-  );
-  const fullLoreText = useMemo(() => segments.map((segment) => segment.text).join('\n\n'), [segments]);
-  const [typedLore, setTypedLore] = useState('');
+  }, [displayNotice, typeTick, started]);
 
   useEffect(() => {
-    setTypedLore('');
+    if (!loreOpen) return;
+    setLoreTyped('');
+    setLoreTick((tick) => tick + 1);
+  }, [loreOpen, lorePage, currentLoreText]);
+
+  useEffect(() => {
+    if (!loreOpen) return;
+    const tick = loreTick;
     let index = 0;
     const timer = window.setInterval(() => {
       index += 1;
-      setTypedLore(fullLoreText.slice(0, index));
-      const typedChar = fullLoreText[index - 1];
-      if (typedChar && typedChar.trim() && index % 2 === 0) {
-        onPlaySound('type');
-      }
-      if (index >= fullLoreText.length) {
+      if (index % 2 === 0) playSound('type');
+      setLoreTyped(currentLoreText.slice(0, index));
+      if (index >= currentLoreText.length || tick !== loreTick) {
         window.clearInterval(timer);
       }
-    }, 18);
+    }, TYPEWRITER_SPEED_MS);
 
     return () => window.clearInterval(timer);
-  }, [fullLoreText, onPlaySound, pageNumber]);
+  }, [currentLoreText, loreTick, loreOpen]);
 
-  const visibleSegments = getVisibleLoreSegments(segments, typedLore);
-  const terminalSegments = visibleSegments.filter((segment) => segment.kind === 'terminal' && segment.text);
+  const choose = (key: OptionKey) => {
+    clickSound();
+    const outcome = scene.outcomes[key];
+    setHistory((prev) => [
+      ...prev,
+      {
+        scene: scene.title,
+        choice: scene.options.find((option) => option.key === key)?.label ?? key,
+        result: outcome.result,
+      },
+    ]);
+    setSceneId(outcome.nextId);
+  };
 
-  return (
-    <article className="badEndingLore" aria-label="Bad ending story lore">
-      <div className="lorePage" key={pageNumber}>
-        {page.image && <img className="loreImage" src={page.image} alt="Unknown B trapped inside the company system" />}
-        <p className="choicesKicker">{page.eyebrow}</p>
-        {visibleSegments.map((segment, index) => {
-          if (!segment.text || segment.kind === 'terminal') return null;
-          if (segment.kind === 'title') {
-            return (
-              <h3 key={`${segment.kind}-${index}`}>
-                {segment.text}
-                <span className="typewriterCursor" aria-hidden="true">_</span>
-              </h3>
-            );
-          }
-          return <p key={`${segment.kind}-${index}`}>{segment.text}</p>;
-        })}
-        {terminalSegments.length > 0 && (
-          <div className="terminalBox loreTerminalBox">
-            {terminalSegments.map((segment, index) => (
-              <span key={`${segment.text}-${index}`}>{segment.text}</span>
-            ))}
-          </div>
-        )}
-      </div>
-      <div className="loreControls">
-        <button className="secondaryButton" onClick={onBack}>
-          {pageNumber === 1 ? 'Close' : 'Back'}
-        </button>
-        <span>{pageNumber} / {totalPages}</span>
-        <button className="secondaryButton" onClick={onNext}>
-          {isLastPage ? 'Close' : 'Next'}
-        </button>
-      </div>
-    </article>
-  );
-}
+  const observe = (label: string, note: string) => {
+    observeSound();
+    setDisplayNotice(note);
+    setTypeTick((tick) => tick + 1);
+  };
 
-function getVisibleLoreSegments(segments: LoreSegment[], typedText: string) {
-  let cursor = 0;
-  return segments.map((segment, index) => {
-    const separatorLength = index === 0 ? 0 : 2;
-    cursor += separatorLength;
-    const visibleLength = Math.max(0, Math.min(segment.text.length, typedText.length - cursor));
-    cursor += segment.text.length;
-    return {
-      ...segment,
-      text: segment.text.slice(0, visibleLength)
-    };
-  });
-}
+  const reset = () => {
+    restartSound();
+    setSceneId(START_SCENE);
+    setHistory([]);
+    setStarted(false);
+    setDisplayNotice('');
+    setTypedNotice('');
+    setLoreOpen(false);
+    setLorePage(0);
+  };
 
-function ProgressIndicator({ scene }: { scene: StoryScene }) {
-  const activeFloor = scene.floor ?? (scene.id === 'trueEnding' ? 5 : 0);
+  const begin = () => {
+    clickSound();
+    initAudio();
+    setStarted(true);
+    startBackground();
+    setDisplayNotice(story[START_SCENE].description);
+    setTypeTick((tick) => tick + 1);
+  };
 
-  return (
-    <div className="progressTrack" aria-label="Progress indicator">
-      {[1, 2, 3, 4, 5].map((floor) => (
-        <span className={floor <= activeFloor ? 'active' : ''} key={floor} aria-label={`Step ${floor}`} />
-      ))}
-    </div>
-  );
-}
+  const toggleFullscreen = () => {
+    clickSound();
+    setFullscreen((value) => !value);
+  };
 
-function SceneIllustration({
-  sceneClass,
-  hotspots,
-  onObserve,
-  onPlaySound
-}: {
-  sceneClass: string;
-  hotspots: StoryScene['hotspots'];
-  onObserve?: (clue: string) => void;
-  onPlaySound?: (event: SoundEvent) => void;
-}) {
-  return (
-    <div className={`sceneIllustration ${sceneClass}`} aria-label="Horror office scene">
-      <div className="ceilingLight" />
-      <div className="backWall">
-        <div className="windowBand" />
-        <div className="exitGlow">EXIT</div>
-      </div>
-      <div className="floorPlane" />
-      <div className="deskSet">
-        <div className="monitor mainMonitor">
-          <span />
+  const openLore = () => {
+    clickSound();
+    setLorePage(0);
+    setLoreOpen(true);
+  };
+
+  const closeLore = () => {
+    clickSound();
+    setLoreOpen(false);
+    setLorePage(0);
+  };
+
+  const nextLore = () => {
+    clickSound();
+    setLorePage((page) => Math.min(page + 1, badEndingLorePages.length - 1));
+  };
+
+  const prevLore = () => {
+    clickSound();
+    if (lorePage === 0) {
+      closeLore();
+      return;
+    }
+    setLorePage((page) => Math.max(page - 1, 0));
+  };
+
+  const renderLorePageText = () => {
+    let cursor = 0;
+    return currentLoreSegments.map((segment, index) => {
+      const start = cursor;
+      const end = cursor + segment.text.length;
+      cursor = end + 1;
+      const visible = loreTyped.slice(start, Math.min(end, loreTyped.length));
+      const key = `${segment.type}-${index}-${segment.text}`;
+      if (segment.type === 'terminal') {
+        return <code key={key}>{visible}</code>;
+      }
+      return <p key={key}>{visible}</p>;
+    });
+  };
+
+  const renderScene = (sceneData: StoryScene) => (
+    <section className={`sceneFrame scene-${sceneData.id}`}>
+      <div className={`sceneIllustration ${sceneData.image}`}>
+        <div className="sceneGlitch" />
+        {sceneData.hotspots.map((hotspot, index) => (
+          <button
+            key={hotspot.label}
+            className={`hotspot hotspot${index + 1}`}
+            style={{ left: hotspot.x, top: hotspot.y }}
+            onClick={() => observe(hotspot.label, hotspot.note)}
+          >
+            <Eye size={14} />
+            <span>{hotspot.label}</span>
+          </button>
+        ))}
+        <div className="sceneHud">
+          <p className="kicker">Floor {sceneData.floor}</p>
+          <h2>{sceneData.title}</h2>
         </div>
-        <div className="keyboard" />
-        <div className="coffeeCup" />
+        <div className="timeBadge">{sceneData.timestamp}</div>
+        <div className="ambientReadout">{sceneData.ambient}</div>
+        <div className="typewriterNotice">
+          <p className="kicker">What you notice</p>
+          <strong>
+            {typedNotice}
+            {typedNotice.length < displayNotice.length ? <span className="typewriterCursor">_</span> : null}
+          </strong>
+        </div>
       </div>
-      <div className="leftCubicle" />
-      <div className="rightCubicle" />
-      <div className="chairShape" />
-      <div className="printerProp" />
-      <div className="conferenceTable" />
-      <div className="cameraWall" />
-      <div className="phoneProp" />
-      <div className="auditWall" />
-      <div className="managerDesk" />
-      <div className="elevatorDoors" />
-      <div className="humanShape humanOne" />
-      <div className="humanShape humanTwo" />
-      <div className="paperTrail" />
-      <div className="sceneGlitch" />
-      {hotspots.map((hotspot, index) => (
-        <button
-          className={`hotspot hotspot${index + 1}`}
-          key={hotspot.id}
-          onClick={() => {
-            onPlaySound?.('observe');
-            onObserve?.(hotspot.clue);
-          }}
-          aria-label={hotspot.label}
-        >
-          <Eye size={15} />
-          <span>{hotspot.label}</span>
-        </button>
-      ))}
+    </section>
+  );
+
+  const renderLore = () => (
+    <div className="badEndingLore">
+      <article className="lorePage" key={lorePage}>
+        {currentLorePage.image ? (
+          <img className="loreImage" src={currentLorePage.image} alt={`${currentLorePage.title} illustration`} />
+        ) : null}
+        <p className="choicesKicker">{currentLorePage.eyebrow}</p>
+        <h3>{currentLorePage.title}</h3>
+        <div className="loreTypedText">{renderLorePageText()}</div>
+        {currentLorePage.terminal ? <pre className="terminalBox loreTerminal">{renderLorePageText().filter((_, index) => currentLoreSegments[index]?.type === 'terminal')}</pre> : null}
+      </article>
+      <div className="loreControls">
+        <button className="secondaryButton" onClick={prevLore}>{lorePage === 0 ? 'Close' : 'Back'}</button>
+        <span>{lorePage + 1} / {badEndingLorePages.length}</span>
+        <button className="secondaryButton" onClick={nextLore} disabled={lorePage === badEndingLorePages.length - 1}>Next</button>
+      </div>
     </div>
   );
-}
 
-function Terminal({ lines }: { lines: string[] }) {
+  if (!started) {
+    return (
+      <main className="appShell introMode">
+        <section className="introPanel">
+          <p className="kicker">{introScreen.eyebrow}</p>
+          <h1>{introScreen.title}</h1>
+          <p>{introScreen.body}</p>
+          <div className="terminalBox">
+            {introScreen.terminal.map((line) => <code key={line}>{line}</code>)}
+          </div>
+          <button className="primaryButton" onClick={begin}>Start</button>
+        </section>
+      </main>
+    );
+  }
+
   return (
-    <div className="terminalBox">
-      {lines.map((line) => (
-        <span key={line}>{line}</span>
-      ))}
-    </div>
-  );
-}
+    <main className={`appShell ${fullscreen ? 'fullscreenMode' : ''}`}>
+      <header className="topBar">
+        <div>
+          <p className="kicker">Office</p>
+          <h1>The Endless Shift</h1>
+        </div>
+        <div className="statusCluster">
+          <span>Floor {scene.floor} / 5</span>
+          <button aria-label={muted ? 'Unmute' : 'Mute'} onClick={() => setMuted((value) => !value)}>
+            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          </button>
+          <button aria-label="Toggle fullscreen" onClick={toggleFullscreen}><Maximize2 size={18} /></button>
+        </div>
+      </header>
 
-createRoot(document.getElementById('root') as HTMLElement).render(<App />);
+      <div className="immersiveLayout">
+        {renderScene(scene)}
+
+        <aside className={`actionPanel ${loreOpen ? 'storybookMode' : ''}`}>
+          {loreOpen ? renderLore() : (
+            <>
+              <div className="progressTrack">
+                {[1, 2, 3, 4, 5].map((floor) => (
+                  <span key={floor} className={floor === scene.floor ? 'active' : ''}>{floor}</span>
+                ))}
+              </div>
+
+              {scene.terminal.length ? (
+                <div className="terminalBox">
+                  {scene.terminal.map((line) => <code key={line}>{line}</code>)}
+                </div>
+              ) : null}
+
+              {scene.result === 'bad' || scene.result === 'true' ? (
+                <button className="secondaryButton" onClick={reset}><RotateCcw size={16} /> Restart loop</button>
+              ) : null}
+
+              {scene.id === 'badEnding2' ? (
+                <button className="secondaryButton loreButton" onClick={openLore}>Story Core Setting</button>
+              ) : null}
+
+              {scene.options.length ? <p className="choicesKicker">What will you do</p> : null}
+              <div className="choicesList">
+                {scene.options.map((option) => (
+                  <button key={option.key} className="choiceButton" onClick={() => choose(option.key)}>
+                    <span className="choiceKey">{option.key}</span>
+                    <span>{option.label}</span>
+                    <span aria-hidden>›</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="pathLog">
+                <p className="choicesKicker">Path</p>
+                {history.length ? history.map((entry, index) => (
+                  <p key={`${entry.scene}-${index}`}>
+                    {index + 1}. {entry.scene}: {entry.choice} — {entry.result}
+                  </p>
+                )) : <p>No choices recorded.</p>}
+              </div>
+            </>
+          )}
+        </aside>
+      </div>
+    </main>
+  );
+};
+
+createRoot(document.getElementById('root')!).render(<App />);
